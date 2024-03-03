@@ -311,7 +311,6 @@ void CameraPresets::RenderWindow() {
         }
         ImGui::Separator();
 
-        ImGui::PushID("ProCamerasAdd");
         if (ImGui::InputText("Pro Name", &ProPlayerSearch)) {
             ProPlayerCameras.clear();
             ProPlayerCameras = GetProPreset(ProPlayerSearch);
@@ -319,17 +318,20 @@ void CameraPresets::RenderWindow() {
                 ProPlayerCameras.resize(10);
             }
         }
+        ImGui::PushID("ProPlayerList");
         for (CP_CameraSettings cam : ProPlayerCameras) {
             if (ImGui::Button("Add")) {
                 cameras.push_back(cam);
                 CreatePreset = false;
                 settingsChanged = true;
                 InputNameError = false;
+                ProPlayerSearch.clear();
+                ProPlayerCameras.clear();
             }
             ImGui::SameLine();
             ImGui::Text(cam.name.c_str());
+            ImGui::PopID();
         }
-        ImGui::PopID();
         ImGui::Separator();
         ImGui::InputText("Enter Code", &CodeAdder);
         ImGui::SameLine();
