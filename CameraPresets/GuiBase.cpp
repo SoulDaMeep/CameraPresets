@@ -217,10 +217,17 @@ void CameraPresets::RenderWindow() {
     }
     if (ImGui::BeginTabItem("-Help/Info-")) {
         ImGui::Text("CameraPresets is a plugin that adds functionality and a user friendly GUI to the original outdated pro settings implemented by bakkesmod");
-        ImGui::Text("If you are a pro that wants their name added to the list please contact @souldameep on discord and I will add you in the next update");
+        ImGui::Spacing();
+        ImGui::Text("If you are a pro that wants their name added to the list please contact @souldameep on discord and I will add you in the next update.");
+        ImGui::Spacing();
+        ImGui::Text("Please do not manually edit external files associated to this plugin. Your game may crash on startup.");
         ImGui::Separator();
         ImGui::Text("Codes: ");
         ImGui::BulletText("Guide: NAME#FOV#HEIGHT#ANGLE#STIFFNESS#TRANSITIONSPEED#DISTANCE#SWIVELSPEED | \nExample: Squishy#110#90# -5#0.5#1.00#270#6.00");
+        ImGui::Separator();
+        ImGui::Text("Credits: ");
+        ImGui::Text("Kandda. - Concept and Thumbnail artist. Play Tester");
+        ImGui::Text("+left - Pro Camera Settings list");
         ImGui::EndTabItem();
     }
 
@@ -310,8 +317,8 @@ void CameraPresets::RenderWindow() {
             });
         }
         ImGui::Separator();
-
-        if (ImGui::InputText("Pro Name", &ProPlayerSearch)) {
+        ImGui::Text("Add Pro Player Presets: ");
+        if (ImGui::InputTextWithHint("Pro Name", "Enter Pro Player's name", &ProPlayerSearch)) {
             ProPlayerCameras.clear();
             ProPlayerCameras = GetProPreset(ProPlayerSearch);
             if (ProPlayerCameras.size() > 10) {
@@ -332,6 +339,7 @@ void CameraPresets::RenderWindow() {
             ImGui::Text(cam.name.c_str());
             ImGui::PopID();
         }
+        if(!ProPlayerCameras.empty()) ImGui::Text("Provided by Liquipedia.");
         ImGui::Separator();
         ImGui::InputText("Enter Code", &CodeAdder);
         ImGui::SameLine();
