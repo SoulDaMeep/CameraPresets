@@ -50,7 +50,6 @@ class CameraPresets: public BakkesMod::Plugin::BakkesModPlugin
     int oldSelected = 0;
     std::string ProPlayerSearch;
     bool isValidCode(std::string code);
-    void SaveDataToFile(std::string playername, std::vector<std::string> values);
     void DeletePlayerFromFile(std::string playername);
     void SaveToFile(std::string data);
     void GetAllCodes(std::string inputcode);

@@ -68,13 +68,12 @@ void CameraPresets::RenderWindow() {
         inputFile.close();
     }
     else {
-        LOG("Could not open file");
+        LOG("CameraPresets: Could not open file {}", "cameras_rlcs.data");
     }
 
     if (settingsChanged) {
         std::string data;
         for (CP_CameraSettings camera : cameras) {
-            LOG("{}", camera.name);
             data += CreateSettingString(camera);
         }
         SaveToFile(data);
@@ -102,7 +101,6 @@ void CameraPresets::RenderWindow() {
                 ImGui::PopID();
             }
         }
-
         ImGui::EndChild();
         ImGui::SameLine();
         if (selected < cameras.size()) {
@@ -114,9 +112,6 @@ void CameraPresets::RenderWindow() {
             ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
             ImGui::Text(cameras.at(selected).name.c_str());
             ImGui::Separator();
-
-
-            
             if (ImGui::SliderInt("FOV", &cameras.at(selected).FOV, 60, 110)) {
                 settingsChanged = true;
             }
@@ -168,9 +163,8 @@ void CameraPresets::RenderWindow() {
                     // clear copy code message after 2 seconds
                 });
             }
-            if(CopyCodeMessage) {
-                ImGui::Text("You Copied The Code!");
-            }
+            if(CopyCodeMessage) ImGui::Text("You Copied The Code!");
+            
             ImGui::EndChild();
             ImGui::EndGroup();
         }
@@ -192,9 +186,8 @@ void CameraPresets::RenderWindow() {
         }
 
         ImGui::SameLine();
-        if (ImGui::Button("Clear All Presets")) {
-            DeleteWindow = true;
-        }
+        if (ImGui::Button("Clear All Presets")) DeleteWindow = true;
+        
         ImGui::SameLine();
         if (ImGui::Button("Delete")) {
             if(!cameras.empty()){
@@ -239,9 +232,8 @@ void CameraPresets::RenderWindow() {
         ImGui::Begin("Delete ALL Presets", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::Text("Are you sure you want to delete all your presets");
         ImGui::Text("These changes CANNOT be undone");
-        if (ImGui::Button("Cancel")) {
-            DeleteWindow = false;
-        }
+        if (ImGui::Button("Cancel")) DeleteWindow = false;
+        
         ImGui::SameLine();
         if (ImGui::Button("Delete All")) {
             DeleteWindow = false;
@@ -345,18 +337,30 @@ void CameraPresets::RenderWindow() {
         ImGui::SameLine();
         if (ImGui::Button("Add Code")) {
             GetAllCodes(CodeAdder);
+            CodeAdder.clear();
         }
         if (!ImportedCodes.empty()) {
-            for (CP_CameraSettings cam : ImportedCodes) {
+            ImGui::PushID("DeleteImportCode");
+            for (auto it = ImportedCodes.begin(); it != ImportedCodes.end();) {
+                CP_CameraSettings& cam = *it;
+                
+                if (ImGui::Button("Remove")) {
+                    it = ImportedCodes.erase(it);  // Erase and update iterator
+                    continue;
+                }
+                ImGui::SameLine();
                 if (ImGui::TreeNode(cam.name.c_str())) {
                     ImGui::TextUnformatted(("FOV: " + std::to_string(cam.FOV)).c_str());
                     ImGui::TextUnformatted(("Distance: " + std::to_string(cam.Distance)).c_str());
                     ImGui::TextUnformatted(("Height: " + std::to_string(cam.Height)).c_str());
-                    ImGui::TextUnformatted(("Stiffness: " + std::format("{}", cam.Stiffness)).c_str());
-                    ImGui::TextUnformatted(("SwivelSpeed: " + std::format("{}", cam.SwivelSpeed)).c_str());
-                    ImGui::TextUnformatted(("TransitionSpeed: " + std::format("{}", cam.TransitionSpeed)).c_str());
+                    ImGui::TextUnformatted(("Stiffness: " + std::to_string(cam.Stiffness)).c_str());
+                    ImGui::TextUnformatted(("SwivelSpeed: " + std::to_string(cam.SwivelSpeed)).c_str());
+                    ImGui::TextUnformatted(("TransitionSpeed: " + std::to_string(cam.TransitionSpeed)).c_str());
                     ImGui::TreePop();
                 }
+
+                ++it;
+                ImGui::PopID();
             }
         }
         if (ImGui::Button("Add All")) {
