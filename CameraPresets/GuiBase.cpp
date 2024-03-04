@@ -214,6 +214,8 @@ void CameraPresets::RenderWindow() {
         ImGui::Text("If you are a pro that wants their name added to the list please contact @souldameep on discord and I will add you in the next update.");
         ImGui::Spacing();
         ImGui::Text("Please do not manually edit external files associated to this plugin. Your game may crash on startup.");
+        ImGui::Spacing();
+        ImGui::Text("If you do find a bug or something that looks off please message me on discord @souldameep");
         ImGui::Separator();
         ImGui::Text("Codes: ");
         ImGui::BulletText("Guide: NAME#FOV#HEIGHT#ANGLE#STIFFNESS#TRANSITIONSPEED#DISTANCE#SWIVELSPEED | \nExample: Squishy#110#90# -5#0.5#1.00#270#6.00");
