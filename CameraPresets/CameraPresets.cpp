@@ -25,9 +25,10 @@ void CameraPresets::LoadSave() {
     std::fstream inputFile;
     std::string data;
     inputFile.open(gameWrapper->GetDataFolder() / "CameraPresets_Save.txt", std::ios::in);
-    if (inputFile.is_open()) {
+    if (inputFile.is_open()) { // always check whether the file is open
         std::string line;
         while (std::getline(inputFile, line)) {
+            // Tokenize the line using spaces
             std::istringstream iss(line);
             std::string linePlayerName;
 
@@ -212,7 +213,7 @@ void CameraPresets::onUnload() {
     std::fstream inputFile;
     std::string data;
     inputFile.open(gameWrapper->GetDataFolder() / "cameras_rlcs.data", std::ios::in);
-    if (inputFile.is_open()) {
+    if (inputFile.is_open()) { // always check whether the file is open
         std::string line;
         while (std::getline(inputFile, line)) {
             // Tokenize the line using spaces
