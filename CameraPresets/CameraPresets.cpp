@@ -3,7 +3,7 @@
 #include "CameraPresets.h"
 
 
-BAKKESMOD_PLUGIN(CameraPresets, "write a plugin description here", plugin_version, PLUGINTYPE_FREEPLAY)
+BAKKESMOD_PLUGIN(CameraPresets, "Change Camera Settings with ease", plugin_version, PLUGINTYPE_FREEPLAY)
 
 std::shared_ptr < CVarManagerWrapper > _globalCvarManager;
 
@@ -18,10 +18,29 @@ void CameraPresets::onLoad() {
     PlayerCameraSettings.Stiffness = settings.Stiffness;
     PlayerCameraSettings.SwivelSpeed = settings.SwivelSpeed;
     PlayerCameraSettings.TransitionSpeed = settings.TransitionSpeed;
-
+    LoadSave();
 }
-std::vector<CameraPresets::CP_CameraSettings> CameraPresets::GetProPreset(std::string substring) {
 
+void CameraPresets::LoadSave() {
+    std::fstream inputFile;
+    std::string data;
+    inputFile.open(gameWrapper->GetDataFolder() / "CameraPresets_Save.txt", std::ios::in);
+    if (inputFile.is_open()) { // always check whether the file is open
+        std::string line;
+        while (std::getline(inputFile, line)) {
+            // Tokenize the line using spaces
+            std::istringstream iss(line);
+            std::string linePlayerName;
+
+            data += line + "\n";
+        }
+        inputFile.close();
+    }
+    SaveToFile(data);
+}
+
+
+std::vector<CameraPresets::CP_CameraSettings> CameraPresets::GetProPreset(std::string substring) {
     std::fstream inputFile(gameWrapper->GetDataFolder() / "CameraPresets.txt", std::ios::in);
     std::vector<CP_CameraSettings> t_Cameras;
     if (inputFile.is_open()) {
@@ -154,6 +173,20 @@ CameraPresets::CP_CameraSettings CameraPresets::parseCode(const std::string& inp
     return settings;
 }
 
+void CameraPresets::DumpSave(std::string data) {
+    std::fstream outfile;
+
+    outfile.open(gameWrapper->GetDataFolder() / "CameraPresets_Save.txt", std::ios::out);
+    if (outfile.is_open()) {
+        outfile << data;
+        outfile.close();
+    }
+    else {
+        LOG("CameraPresets: Could not open file {}", "cameras_rlcs.data");
+    }
+}
+
+
 void CameraPresets::GetAllCodes(std::string inputcode) {
 
     std::istringstream iss(inputcode);
@@ -174,4 +207,22 @@ void CameraPresets::GetAllCodes(std::string inputcode) {
             LOG("CameraPresets - Not Valid {}", value);
         }
     }
+}
+
+void CameraPresets::onUnload() {
+    std::fstream inputFile;
+    std::string data;
+    inputFile.open(gameWrapper->GetDataFolder() / "cameras_rlcs.data", std::ios::in);
+    if (inputFile.is_open()) { // always check whether the file is open
+        std::string line;
+        while (std::getline(inputFile, line)) {
+            // Tokenize the line using spaces
+            std::istringstream iss(line);
+            std::string linePlayerName;
+
+            data += line + "\n";
+        }
+        inputFile.close();
+    }
+    DumpSave(data);
 }

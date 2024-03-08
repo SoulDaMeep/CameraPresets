@@ -77,6 +77,7 @@ void CameraPresets::RenderWindow() {
             data += CreateSettingString(camera);
         }
         SaveToFile(data);
+        DumpSave(data);
         settingsChanged = false;
     }
     
