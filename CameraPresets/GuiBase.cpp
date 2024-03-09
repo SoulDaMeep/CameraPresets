@@ -82,7 +82,7 @@ void CameraPresets::RenderWindow() {
     }
     
     ImGui::SetNextWindowSize(ImVec2{900, 400});
-    ImGui::Begin("CameraPresets", &isWindowOpen_, ImGuiWindowFlags_MenuBar);
+    ImGui::Begin("CameraPresets");
     ImGui::BeginTabBar("Tab");
     if(ImGui::BeginTabItem("-Presets-")) {
         ImGui::BeginChild("left pane", ImVec2(200, -ImGui::GetFrameHeightWithSpacing()), true);
