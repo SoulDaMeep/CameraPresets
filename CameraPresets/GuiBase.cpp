@@ -21,7 +21,7 @@ std::string PluginWindowBase::GetMenuTitle() {
 void CameraPresets::RenderSettings() {
 
     if (ImGui::Button("Open Presets Window")) gameWrapper->Execute([this](GameWrapper* gw) {
-        _globalCvarManager->executeCommand("togglemenu CameraPresets");
+        _globalCvarManager->executeCommand("togglemenu " + GetMenuName());
     });
     ImGui::Text("F5 is Window Bind");
 }
@@ -282,7 +282,6 @@ void CameraPresets::RenderWindow() {
                     break;
                 }
             }
-
             if (!PresetName.empty() && !containsSpace) {
                 cameras.push_back(tempCamera);
                 PresetName.clear();
@@ -414,7 +413,6 @@ void PluginWindowBase::Render() {
     RenderWindow();
 
     ImGui::End();
-
     if (!isWindowOpen_) {
         _globalCvarManager->executeCommand("togglemenu " + GetMenuName());
     }

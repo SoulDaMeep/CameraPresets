@@ -10,6 +10,9 @@ std::shared_ptr < CVarManagerWrapper > _globalCvarManager;
 void CameraPresets::onLoad() {
     _globalCvarManager = cvarManager;
 
+    cvarManager->setBind("F5", "togglemenu CameraPresets");
+
+
     ProfileCameraSettings settings = gameWrapper->GetSettings().GetCameraSettings();
     PlayerCameraSettings.FOV = settings.FOV;
     PlayerCameraSettings.Distance = settings.Distance;
@@ -19,8 +22,8 @@ void CameraPresets::onLoad() {
     PlayerCameraSettings.SwivelSpeed = settings.SwivelSpeed;
     PlayerCameraSettings.TransitionSpeed = settings.TransitionSpeed;
     LoadSave();
+    isWindowOpen_ = false;
 }
-
 void CameraPresets::LoadSave() {
     std::fstream inputFile;
     std::string data;
