@@ -18,15 +18,15 @@ std::string PluginWindowBase::GetMenuTitle() {
     return menuTitle_;
 }
 
+//void CameraPresets::RenderSettings() {
+//
+//    //if (ImGui::Button("Open Presets Window")) gameWrapper->Execute([this](GameWrapper* gw) {
+//    //    _globalCvarManager->executeCommand("togglemenu " + GetMenuName());
+//    //});
+//    //ImGui::Text("F5 is Window Bind");
+//}
+
 void CameraPresets::RenderSettings() {
-
-    if (ImGui::Button("Open Presets Window")) gameWrapper->Execute([this](GameWrapper* gw) {
-        _globalCvarManager->executeCommand("togglemenu " + GetMenuName());
-    });
-    ImGui::Text("F5 is Window Bind");
-}
-
-void CameraPresets::RenderWindow() {
     std::fstream inputFile(CameraFolder, std::ios::in);
     if (inputFile.is_open()) {
         std::string line;
@@ -80,8 +80,7 @@ void CameraPresets::RenderWindow() {
         DumpSave(data);
         settingsChanged = false;
     }
-    
-    ImGui::SetNextWindowSize(ImVec2{900, 400});
+   
     ImGui::BeginTabBar("Tab");
     if(ImGui::BeginTabItem("-Presets-")) {
         ImGui::BeginChild("left pane", ImVec2(200, -ImGui::GetFrameHeightWithSpacing()), true);
@@ -229,7 +228,6 @@ void CameraPresets::RenderWindow() {
     ImGui::EndTabBar();
 
     if (DeleteWindow) {
-        ImGui::PushID("DeleteWindow");
         ImGui::Begin("Delete ALL Presets", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::Text("Are you sure you want to delete all your presets");
         ImGui::Text("These changes CANNOT be undone");
@@ -245,11 +243,9 @@ void CameraPresets::RenderWindow() {
             settingsChanged = true;
         }
         ImGui::End();
-        ImGui::PopID();
     }
 
     if (CreatePreset) {
-        ImGui::PushID("CreatePreset");
         ImGui::Begin("Create Preset", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
         if(InputNameError) ImGui::Text("Please input a proper name (no spaces)");

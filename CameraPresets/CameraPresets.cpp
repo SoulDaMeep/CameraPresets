@@ -22,7 +22,6 @@ void CameraPresets::onLoad() {
     PlayerCameraSettings.SwivelSpeed = settings.SwivelSpeed;
     PlayerCameraSettings.TransitionSpeed = settings.TransitionSpeed;
     LoadSave();
-    isWindowOpen_ = false;
 }
 void CameraPresets::LoadSave() {
     std::fstream inputFile;
