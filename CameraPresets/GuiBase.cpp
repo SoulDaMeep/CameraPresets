@@ -210,11 +210,12 @@ void CameraPresets::RenderSettings() {
     if (ImGui::BeginTabItem("-Help/Info-")) {
         ImGui::Text("CameraPresets is a plugin that adds functionality and a user friendly GUI to the original outdated pro settings implemented by bakkesmod");
         ImGui::Spacing();
-        ImGui::Text("If you are a pro that wants their name added to the list please contact @souldameep on discord and I will add you in the next update.");
+        ImGui::Text("If you are a pro that wants their name added to the list please contact me.");
+        ImGui::Text("If you are upset that a pro is not in the list please contact me.");
+        ImGui::Text("If you do find a bug or something that looks off please contact me.");
         ImGui::Spacing();
         ImGui::Text("Please do not manually edit external files associated to this plugin. Your game may crash on startup.");
         ImGui::Spacing();
-        ImGui::Text("If you do find a bug or something that looks off please message me on discord @souldameep");
         ImGui::Separator();
         ImGui::Text("Codes: ");
         ImGui::BulletText("Guide: NAME#FOV#HEIGHT#ANGLE#STIFFNESS#TRANSITIONSPEED#DISTANCE#SWIVELSPEED | \nExample: Squishy#110#90# -5#0.5#1.00#270#6.00");
@@ -222,6 +223,9 @@ void CameraPresets::RenderSettings() {
         ImGui::Text("Credits: ");
         ImGui::Text("Kandda. - Concept and Thumbnail artist. Play Tester");
         ImGui::Text("+left - Pro Camera Settings list");
+        ImGui::Separator();
+        ImGui::Text("Contact Info:");
+        ImGui::Text("Discord: @souldameep\nGithub: SoulDaMeep");
         ImGui::EndTabItem();
     }
 
