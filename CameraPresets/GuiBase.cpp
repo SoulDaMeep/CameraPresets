@@ -37,7 +37,7 @@ void CameraPresets::RenderSettings() {
             // Extract the player name
             iss >> playerName;
             // make sure there is actually a player there and not a new line character.
-            if(playerName.empty()) break;
+            if (playerName.empty()) break;
             // Tokenize the rest of the line using spaces and store in a vector
             std::string word;
             while (iss >> word) values.push_back(word);
@@ -82,7 +82,8 @@ void CameraPresets::RenderSettings() {
         settingsChanged = false;
     }
    
-
+    ImGui::BeginTabBar("Tab");
+    if(ImGui::BeginTabItem("-Presets-")) {
         ImGui::BeginChild("left pane", ImVec2(200, -ImGui::GetFrameHeightWithSpacing()), true);
         ImGui::InputText("Search", &SearchName);
         for (int i = 0; i < cameras.size(); i++)
@@ -204,25 +205,32 @@ void CameraPresets::RenderSettings() {
                 settingsChanged = true;
             }
         }
-        //ImGui::Text("CameraPresets is a plugin that adds functionality and a user friendly GUI to the original outdated pro settings implemented by bakkesmod");
-        //ImGui::Spacing();
-        //ImGui::Text("If you are a pro that wants their name added to the list please contact me.");
-        //ImGui::Text("If you are upset that a pro is not in the list please contact me.");
-        //ImGui::Text("If you do find a bug or something that looks off please contact me.");
-        //ImGui::Spacing();
-        //ImGui::Text("Please do not manually edit external files associated to this plugin. Your game may crash on startup.");
-        //ImGui::Spacing();
-        //ImGui::Separator();
-        //ImGui::Text("Codes: ");
-        //ImGui::BulletText("Guide: NAME#FOV#HEIGHT#ANGLE#STIFFNESS#TRANSITIONSPEED#DISTANCE#SWIVELSPEED | \nExample: Squishy#110#90# -5#0.5#1.00#270#6.00");
-        //ImGui::Separator();
-        //ImGui::Text("Credits: ");
-        //ImGui::Text("Kandda. - Concept and Thumbnail artist. Play Tester");
-        //ImGui::Text("+left - Pro Camera Settings list");
-        //ImGui::Separator();
-        //ImGui::Text("Contact Info:");
-        //ImGui::Text("Discord: @souldameep\nGithub: SoulDaMeep");
- 
+
+        ImGui::EndTabItem();
+    }
+    if (ImGui::BeginTabItem("-Help/Info-")) {
+        ImGui::Text("CameraPresets is a plugin that adds functionality and a user friendly GUI to the original outdated pro settings implemented by bakkesmod");
+        ImGui::Spacing();
+        ImGui::Text("If you are a pro that wants their name added to the list please contact me.");
+        ImGui::Text("If you are upset that a pro is not in the list please contact me.");
+        ImGui::Text("If you do find a bug or something that looks off please contact me.");
+        ImGui::Spacing();
+        ImGui::Text("Please do not manually edit external files associated to this plugin. Your game may crash on startup.");
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Text("Codes: ");
+        ImGui::BulletText("Guide: NAME#FOV#HEIGHT#ANGLE#STIFFNESS#TRANSITIONSPEED#DISTANCE#SWIVELSPEED | \nExample: Squishy#110#90# -5#0.5#1.00#270#6.00");
+        ImGui::Separator();
+        ImGui::Text("Credits: ");
+        ImGui::Text("Kandda. - Concept and Thumbnail artist. Play Tester");
+        ImGui::Text("+left - Pro Camera Settings list");
+        ImGui::Separator();
+        ImGui::Text("Contact Info:");
+        ImGui::Text("Discord: @souldameep\nGithub: SoulDaMeep");
+        ImGui::EndTabItem();
+    }
+
+    ImGui::EndTabBar();
 
     if (DeleteWindow) {
         ImGui::Begin("Delete ALL Presets", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
