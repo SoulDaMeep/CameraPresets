@@ -318,8 +318,8 @@ void CameraPresets::RenderSettings() {
                 ProPlayerCameras.resize(10);
             }
         }
-        ImGui::PushID("ProPlayerList");
         for (CP_CameraSettings cam : ProPlayerCameras) {
+            ImGui::PushID(cam.name.c_str());
             if (ImGui::Button("Add")) {
                 cameras.push_back(cam);
                 CreatePreset = false;
