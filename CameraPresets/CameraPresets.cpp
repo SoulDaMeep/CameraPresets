@@ -12,7 +12,6 @@ void CameraPresets::onLoad() {
 
     cvarManager->setBind("F5", "togglemenu CameraPresets");
 
-
     ProfileCameraSettings settings = gameWrapper->GetSettings().GetCameraSettings();
     PlayerCameraSettings.FOV = settings.FOV;
     PlayerCameraSettings.Distance = settings.Distance;

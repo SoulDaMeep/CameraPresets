@@ -18,15 +18,14 @@ std::string PluginWindowBase::GetMenuTitle() {
     return menuTitle_;
 }
 
-//void CameraPresets::RenderSettings() {
-//
-//    //if (ImGui::Button("Open Presets Window")) gameWrapper->Execute([this](GameWrapper* gw) {
-//    //    _globalCvarManager->executeCommand("togglemenu " + GetMenuName());
-//    //});
-//    //ImGui::Text("F5 is Window Bind");
-//}
-
 void CameraPresets::RenderSettings() {
+
+    if (ImGui::Button("Open Presets Window")) gameWrapper->Execute([this](GameWrapper* gw) {
+        _globalCvarManager->executeCommand("togglemenu " + GetMenuName());
+    });
+    ImGui::Text("F5 is Window Bind");
+}
+void CameraPresets::RenderWindow() {
     std::fstream inputFile(CameraFolder, std::ios::in);
     if (inputFile.is_open()) {
         std::string line;
@@ -211,9 +210,7 @@ void CameraPresets::RenderSettings() {
     if (ImGui::BeginTabItem("-Help/Info-")) {
         ImGui::Text("CameraPresets is a plugin that adds functionality and a user friendly GUI to the original outdated pro settings implemented by bakkesmod");
         ImGui::Spacing();
-        ImGui::Text("If you are a pro that wants their name added to the list please contact me.");
-        ImGui::Text("If you are upset that a pro is not in the list please contact me.");
-        ImGui::Text("If you do find a bug or something that looks off please contact me.");
+        ImGui::Text("If you are a pro that wants their preset added to the list, upset because of a missing pro preset or if you found a bug, please contact me");
         ImGui::Spacing();
         ImGui::Text("Please do not manually edit external files associated to this plugin. Your game may crash on startup.");
         ImGui::Spacing();
@@ -286,7 +283,6 @@ void CameraPresets::RenderSettings() {
             if (!PresetName.empty() && !containsSpace) {
                 cameras.push_back(tempCamera);
                 PresetName.clear();
-                CreatePreset = false;
                 settingsChanged = true;
                 InputNameError = false;
             }
@@ -322,7 +318,6 @@ void CameraPresets::RenderSettings() {
             ImGui::PushID(cam.name.c_str());
             if (ImGui::Button("Add")) {
                 cameras.push_back(cam);
-                CreatePreset = false;
                 settingsChanged = true;
                 InputNameError = false;
                 ProPlayerSearch.clear();
@@ -341,9 +336,9 @@ void CameraPresets::RenderSettings() {
             CodeAdder.clear();
         }
         if (!ImportedCodes.empty()) {
-            ImGui::PushID("DeleteImportCode");
             for (auto it = ImportedCodes.begin(); it != ImportedCodes.end();) {
                 CP_CameraSettings& cam = *it;
+                ImGui::PushID(cam.name.c_str());
                 
                 if (ImGui::Button("Remove")) {
                     it = ImportedCodes.erase(it);  // Erase and update iterator
