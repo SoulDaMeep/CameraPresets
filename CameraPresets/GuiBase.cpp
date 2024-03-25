@@ -218,8 +218,12 @@ void CameraPresets::RenderWindow() {
         ImGui::BulletText("Guide: NAME#FOV#HEIGHT#ANGLE#STIFFNESS#TRANSITIONSPEED#DISTANCE#SWIVELSPEED | \nExample: Squishy#110#90# -5#0.5#1.00#270#6.00");
         ImGui::Separator();
         ImGui::Text("Credits: ");
-        ImGui::Text("Kandda. - Concept and Thumbnail artist. Play Tester");
+        ImGui::Text("Kandda. - Concept and Thumbnail artist");
         ImGui::Text("+left - Pro Camera Settings list");
+        ImGui::Text("Play Testers: ");
+        ImGui::Text("sslowdev");
+        ImGui::Text("Rivques");
+        ImGui::Text("Kandda.");
         ImGui::Separator();
         ImGui::Text("Contact Info:");
         ImGui::Text("Discord: @souldameep\nGithub: SoulDaMeep");
