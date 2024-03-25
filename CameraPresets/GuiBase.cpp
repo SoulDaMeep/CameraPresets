@@ -80,7 +80,6 @@ void CameraPresets::RenderWindow() {
         DumpSave(data);
         settingsChanged = false;
     }
-   
     ImGui::BeginTabBar("Tab");
     if(ImGui::BeginTabItem("-Presets-")) {
         ImGui::BeginChild("left pane", ImVec2(200, -ImGui::GetFrameHeightWithSpacing()), true);
@@ -400,7 +399,8 @@ void PluginWindowBase::OnClose() {
 }
 
 void PluginWindowBase::Render() {
-    if (!ImGui::Begin(menuTitle_.c_str(), &isWindowOpen_, ImGuiWindowFlags_None)) {
+    ImGui::SetNextWindowSize(ImVec2 {900, 400});
+    if (!ImGui::Begin(menuTitle_.c_str(), &isWindowOpen_, ImGuiWindowFlags_NoResize)) {
         // Early out if the window is collapsed, as an optimization.
         LOG("CameraPresets Collapse");
         ImGui::End();
