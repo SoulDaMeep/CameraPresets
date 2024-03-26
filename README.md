@@ -32,7 +32,7 @@ Thats right! Just search for you favorite player and you can instantly get their
 
 # What are "codes"?
 ### Codes are very quick and minamalized versions of a camera preset. By clicking "copy code" you will have access to said code for that preset.
-
+![image](https://github.com/SoulDaMeep/CameraPresets/assets/80908765/4e53a29f-ae28-4c81-a7cc-f3a3f374e565)
 
 # 2024 RLCS Worlds Qualifiers Top 8
 
