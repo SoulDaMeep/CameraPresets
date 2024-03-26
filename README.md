@@ -1,5 +1,8 @@
 CameraPresets is a plugin that gives a user friendly gui interaction for bakkesmod's implementation of camera presets
 
+contact info: <br>
+Discord: @souldameep
+
 Thank you to the following:
 > Kandda. : Concept Artist <br>
 > +left : Retrieving numeralable pro camera settings <br>
@@ -68,5 +71,10 @@ trk511#110#100#-5.0#0.40#1.00#270#5.00|Rw9#110#100#-5.0#0.40#1.20#270#3.50|Kiile
 ```
 MaJicBear#109#90#-4.0#0.45#1.50#270#4.30|Retals#110#100#-4.00#0.45#1.70#270#5.50|CHEESE.#110#100#-3.0#0.35#1.20#270#4.70|Thundah#110#100#-3.0#0.45#1.50#260#5.00|
 ```
-contact info:
-Discord: @souldameep
+
+# Where do I put these "codes"?
+### When Creating a Preset, you have the option at the very bottom to paste your codes!
+![image](https://github.com/SoulDaMeep/CameraPresets/assets/80908765/ca5b21d4-179b-4e27-a2a1-39bf5d9a9a47)
+
+### You will then be granted the option to remove whichever specific one you want!
+![image](https://github.com/SoulDaMeep/CameraPresets/assets/80908765/d2685fe1-9dd6-4fae-8580-d531758bee87)
