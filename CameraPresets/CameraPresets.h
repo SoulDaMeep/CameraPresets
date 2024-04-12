@@ -33,6 +33,11 @@ class CameraPresets: public BakkesMod::Plugin::BakkesModPlugin
         float TransitionSpeed;
         std::string code;
     };
+    struct CP_ImportedCode {
+        CP_CameraSettings camera_settings;
+        bool is_open;
+    };
+    bool HideMovementButtons = false;
     bool CreatePreset = false;
     bool NoCodeError = false;
     bool CopyCodeMessage = false;
@@ -53,13 +58,13 @@ class CameraPresets: public BakkesMod::Plugin::BakkesModPlugin
     CP_CameraSettings parseCode(const std::string& input);
     void DumpSave(std::string data);
     void LoadSave();
-    std::vector<CP_CameraSettings> ImportedCodes;
+    std::vector<CP_ImportedCode> ImportedCodes;
     std::vector<CP_CameraSettings> cameras;
     CP_CameraSettings PlayerCameraSettings;
     CP_CameraSettings tempCamera;
     std::string InputCode;
     std::string SearchName;
-    std::string bind = "F5";
+    std::string bind = "F3";
     std::string CodeAdder;
     std::string PresetName;
     std::string CameraFolder = (gameWrapper->GetDataFolder() / "cameras_rlcs.data").string();

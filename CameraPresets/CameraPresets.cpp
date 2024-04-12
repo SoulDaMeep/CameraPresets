@@ -55,10 +55,15 @@ std::vector<CameraPresets::CP_CameraSettings> CameraPresets::GetProPreset(std::s
             while (std::getline(iss, word, '#')) {
                 t_Values.push_back(word);
             }
+
+            std::string temp;
+            for (char c : t_Values[0]) {
+                temp += std::tolower(c);
+            }
             
 
             CP_CameraSettings t_TempCamera;
-            if (t_Values[0].find(substring) != std::string::npos) {
+            if (temp.find(substring) != std::string::npos) {
                 t_TempCamera.name = t_Values[0];
                 t_TempCamera.FOV = std::stoi(t_Values[1]);
                 t_TempCamera.Distance = std::stoi(t_Values[6]);
@@ -202,7 +207,8 @@ void CameraPresets::GetAllCodes(std::string inputcode) {
         if (isValidCode(value + "|")) {
             LOG("Valid {}", value + "|");
             CP_CameraSettings camera = parseCode(value + "|");
-            ImportedCodes.push_back(camera);
+            CP_ImportedCode impCode = {camera, false};
+            ImportedCodes.push_back(impCode);
         }
         else {
             LOG("CameraPresets - Not Valid {}", value);
