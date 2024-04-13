@@ -185,15 +185,21 @@ void CameraPresets::RenderWindow() {
             cc.code = code;
 
             ImVec2 textSize = ImGui::CalcTextSize(cc.code.c_str());
-            ImVec2 childSize = ImVec2{textSize.x + 10, textSize.y + 10}; // Add 10px padding to both width and height
+            ImVec2 childSize = ImVec2{ textSize.x + 10, textSize.y + 10 }; 
+            ImVec2 parentChildWindowSize = {0, ImGui::GetWindowHeight()};
+
+            ImVec2 size = ImVec2{ textSize.x + 10, textSize.y + 10 };
+            ImVec2 childWindowPosition = ImVec2{ 10, parentChildWindowSize.y - childSize.y - 10 }; 
+
+
+            ImGui::SetCursorPos(childWindowPosition);
 
             ImGui::BeginChild("TextPanel", childSize, true, ImGuiWindowFlags_NoScrollbar);
 
-            // Move the child window up by half its height
-            float moveUpAmount  = (childSize.y - 20) * 0.5f;
+            float moveUpAmount = (childSize.y - 20) * 0.5f;
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() - moveUpAmount - 1);
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() - 2.5);
-            // Display the text
+
             ImGui::Text(cc.code.c_str());
 
             ImGui::EndChild();
@@ -299,151 +305,196 @@ void CameraPresets::RenderWindow() {
     }
 
     if (CreatePreset) {
+        
         ImGui::Begin("Create Preset", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-        ImGui::BeginGroup();
-        ImGui::BeginChild("Input", ImVec2{350, 220}, true, ImGuiWindowFlags_NoScrollbar);
-        if(InputNameError) ImGui::Text("Please input a proper name (no spaces)");
 
-        if(ImGui::InputText("Name", &PresetName)) {
-             tempCamera.name = PresetName;
-        }
-        ImGui::SliderInt("FOV", &tempCamera.FOV, 60, 110);
-        if (ImGui::SliderInt("Dist", &tempCamera.Distance, 100, 400)) {
-            tempCamera.Distance = (tempCamera.Distance / 10) * 10; // clamp between 10
-        }
-        if (ImGui::SliderInt("Hei", &tempCamera.Height, 40, 200)) {
-            tempCamera.Height = (tempCamera.Height / 10) * 10; // clamp between 10
-        }
-        ImGui::SliderInt("Ang", &tempCamera.Angle, -15, 0);
-        if (ImGui::SliderFloat("Sti", &tempCamera.Stiffness, 0.0f, 1.0f, "%.2f")) {
-            tempCamera.Stiffness = roundf(tempCamera.Stiffness * 20) / 20;
-        }
-        if (ImGui::SliderFloat("SwiSp", &tempCamera.SwivelSpeed, 1.0f, 10.0f, "%.2f")) {
-            tempCamera.SwivelSpeed = roundf(tempCamera.SwivelSpeed * 10.0f) / 10.0f;
-        }
-        if (ImGui::SliderFloat("TraSp", &tempCamera.TransitionSpeed, 1.0f, 2.0f, "%.2f")) {
-            tempCamera.TransitionSpeed = roundf(tempCamera.TransitionSpeed * 10.0f) / 10.0f;
-        }
-        if (ImGui::Button("Add Preset")) {
-            bool containsSpace = false;
-            for (char c : PresetName) {
-                if (c == ' ') {
-                    containsSpace = true;
-                    break;
+        ImGui::BeginTabBar("CreateMenu");
+        if (ImGui::BeginTabItem("Custom")) {
+
+            ImGui::BeginChild("Input", ImVec2{350, 220}, true, ImGuiWindowFlags_NoScrollbar);
+            if(InputNameError) ImGui::Text("Please input a proper name (no spaces)");
+
+            if(ImGui::InputText("Name", &PresetName)) {
+                 tempCamera.name = PresetName;
+            }
+            ImGui::SliderInt("FOV", &tempCamera.FOV, 60, 110);
+            if (ImGui::SliderInt("Dist", &tempCamera.Distance, 100, 400)) {
+                tempCamera.Distance = (tempCamera.Distance / 10) * 10; // clamp between 10
+            }
+            if (ImGui::SliderInt("Hei", &tempCamera.Height, 40, 200)) {
+                tempCamera.Height = (tempCamera.Height / 10) * 10; // clamp between 10
+            }
+            ImGui::SliderInt("Ang", &tempCamera.Angle, -15, 0);
+            if (ImGui::SliderFloat("Sti", &tempCamera.Stiffness, 0.0f, 1.0f, "%.2f")) {
+                tempCamera.Stiffness = roundf(tempCamera.Stiffness * 20) / 20;
+            }
+            if (ImGui::SliderFloat("SwiSp", &tempCamera.SwivelSpeed, 1.0f, 10.0f, "%.2f")) {
+                tempCamera.SwivelSpeed = roundf(tempCamera.SwivelSpeed * 10.0f) / 10.0f;
+            }
+            if (ImGui::SliderFloat("TraSp", &tempCamera.TransitionSpeed, 1.0f, 2.0f, "%.2f")) {
+                tempCamera.TransitionSpeed = roundf(tempCamera.TransitionSpeed * 10.0f) / 10.0f;
+            }
+            if (ImGui::Button("Add Preset")) {
+                bool containsSpace = false;
+                for (char c : PresetName) {
+                    if (c == ' ') {
+                        containsSpace = true;
+                        break;
+                    }
+                }
+                if (!PresetName.empty() && !containsSpace) {
+                    cameras.push_back(tempCamera);
+                    PresetName.clear();
+                    settingsChanged = true;
+                    InputNameError = false;
+                }
+                else {
+                    InputNameError = true;
                 }
             }
-            if (!PresetName.empty() && !containsSpace) {
-                cameras.push_back(tempCamera);
-                PresetName.clear();
-                settingsChanged = true;
-                InputNameError = false;
-            }
-            else {
-                InputNameError = true;
-            }
-        }
 
 
-        ImGui::SameLine();
-
-        if (ImGui::Button("Copy Current")) {
-            gameWrapper->Execute([this](GameWrapper* gw) {
-                ProfileCameraSettings settings = gameWrapper->GetSettings().GetCameraSettings();
-
-                tempCamera.FOV = settings.FOV;
-                tempCamera.Distance = settings.Distance;
-                tempCamera.Angle = settings.Pitch;
-                tempCamera.Height = settings.Height;
-                tempCamera.Stiffness = settings.Stiffness;
-                tempCamera.SwivelSpeed = settings.SwivelSpeed;
-                tempCamera.TransitionSpeed = settings.TransitionSpeed;
-            });
-        }
-        ImGui::EndChild();
-        ImGui::Separator();
-        ImGui::BeginChild("CachePlayers", ImVec2{350, 52}, true, ImGuiWindowFlags_NoScrollbar);
-        ImGui::Text("Add Pro Player Presets: ");
-        if (ImGui::InputTextWithHint("Pro Name", "Enter Pro Player's name", &ProPlayerSearch)) {
-            ProPlayerCameras.clear();
-            ProPlayerCameras = GetProPreset(ProPlayerSearch);
-            if (ProPlayerCameras.size() > 10) {
-                ProPlayerCameras.resize(10);
-            }
-        }
-        ImGui::EndChild();
-        ImVec2 size = {350, (max(ProPlayerCameras.size(), 1) * 25.0f) + ImGui::CalcTextSize("P").y * 2};
-        
-        ImGui::BeginChild("PlayerList", size, true, ImGuiWindowFlags_NoScrollbar);
-        for (CP_CameraSettings cam : ProPlayerCameras) {
-            ImGui::PushID(cam.name.c_str());
-            if (ImGui::Button("Add")) {
-                cameras.push_back(cam);
-                settingsChanged = true;
-                InputNameError = false;
-                ProPlayerSearch.clear();
-                ProPlayerCameras.clear();
-            }
             ImGui::SameLine();
-            ImGui::Text(cam.name.c_str());
-            ImGui::PopID();
-        }
-        if(!ProPlayerCameras.empty()) ImGui::Text("Provided by Liquipedia under CC-BY-SA 3.0");
-        ImGui::EndChild();
 
-        ImGui::Separator();
-        ImGui::BeginChild("Codes", ImVec2{350, 52}, true, ImGuiWindowFlags_NoScrollbar);
-        if (ImGui::Button("Add Code")) {
-            GetAllCodes(CodeAdder);
-            CodeAdder.clear();
+            if (ImGui::Button("Copy Current")) {
+                gameWrapper->Execute([this](GameWrapper* gw) {
+                    ProfileCameraSettings settings = gameWrapper->GetSettings().GetCameraSettings();
+
+                    tempCamera.FOV = settings.FOV;
+                    tempCamera.Distance = settings.Distance;
+                    tempCamera.Angle = settings.Pitch;
+                    tempCamera.Height = settings.Height;
+                    tempCamera.Stiffness = settings.Stiffness;
+                    tempCamera.SwivelSpeed = settings.SwivelSpeed;
+                    tempCamera.TransitionSpeed = settings.TransitionSpeed;
+                });
+            }
+            ImGui::EndChild();
+            ImGui::EndTabItem();
         }
-        ImGui::SameLine();
-        ImGui::InputText("Enter Code", &CodeAdder);
-        ImGui::EndChild();
-        if (!ImportedCodes.empty()) {
-            for (auto it = ImportedCodes.begin(); it != ImportedCodes.end();) {
-                CP_CameraSettings& cam = it->camera_settings;
+
+        if (ImGui::BeginTabItem("Pros")) {
+            ImGui::BeginChild("CachePlayers", ImVec2{350, 52}, true, ImGuiWindowFlags_NoScrollbar);
+            ImGui::Text("Add Pro Player Presets: ");
+            if (ImGui::InputTextWithHint("Pro Name", "Enter Pro Player's name", &ProPlayerSearch)) {
+                ProPlayerCameras.clear();
+                ProPlayerCameras = GetProPreset(ProPlayerSearch);
+                if (ProPlayerCameras.size() > 10) {
+                    ProPlayerCameras.resize(10);
+                }
+            }
+            ImGui::EndChild();
+            ImVec2 size = {350, (max(ProPlayerCameras.size(), 1) * 25.0f) + ImGui::CalcTextSize("P").y * 2};
+        
+            ImGui::BeginChild("PlayerList", size, true, ImGuiWindowFlags_NoScrollbar);
+            for (CP_CameraSettings cam : ProPlayerCameras) {
                 ImGui::PushID(cam.name.c_str());
-                ImGui::BeginChild("Border", it->is_open ? ImVec2{350.0f, 137.0f} : ImVec2{350, 35.0f}, true);
-                if (ImGui::Button("Remove")) {
-                    it = ImportedCodes.erase(it);  // Erase and update iterator
-                    ImGui::PopID();
-                    continue;
+                if (ImGui::Button("Add")) {
+                    cameras.push_back(cam);
+                    settingsChanged = true;
+                    InputNameError = false;
+                    ProPlayerSearch.clear();
+                    ProPlayerCameras.clear();
                 }
                 ImGui::SameLine();
-                it->is_open = ImGui::TreeNode(cam.name.c_str());
-                if (it->is_open) {
-                    ImGui::TextUnformatted(("FOV: " + std::to_string(cam.FOV)).c_str());
-                    ImGui::TextUnformatted(("Distance: " + std::to_string(cam.Distance)).c_str());
-                    ImGui::TextUnformatted(("Height: " + std::to_string(cam.Height)).c_str());
-                    ImGui::TextUnformatted(("Stiffness: " + std::to_string(cam.Stiffness)).c_str());
-                    ImGui::TextUnformatted(("SwivelSpeed: " + std::to_string(cam.SwivelSpeed)).c_str());
-                    ImGui::TextUnformatted(("TransitionSpeed: " + std::to_string(cam.TransitionSpeed)).c_str());
-                    ImGui::TreePop();
-                }
-                
-                ImGui::EndChild();
+                ImGui::Text(cam.name.c_str());
                 ImGui::PopID();
-                ++it;
             }
+            if(!ProPlayerCameras.empty()) ImGui::Text("Provided by Liquipedia under CC-BY-SA 3.0");
+            ImGui::EndChild();
+            ImGui::EndTabItem();
         }
-        if (ImGui::Button("Add All")) {
 
-            for (CP_ImportedCode code : ImportedCodes) {
-                cameras.push_back(code.camera_settings);
+        if (ImGui::BeginTabItem("Codes")) {
+            ImGui::BeginChild("Codes", ImVec2{350, 35}, true, ImGuiWindowFlags_NoScrollbar);
+            ImGui::Columns(2, "AddCodes");
+            if (ImGui::Button("Add Code")) {
+                GetAllCodes(CodeAdder);
+                CodeAdder.clear();
             }
-            settingsChanged = true;
-            ImportedCodes.clear();
-            ImportCode = false;
-            CodeAdder = "";
+            ImGui::SetColumnWidth(0, 75);
+            ImGui::NextColumn();
+            ImGui::InputText("Enter Code", &CodeAdder);
+            ImGui::SetColumnWidth(1, 225);
+            ImGui::Columns(1);
+            ImGui::EndChild();
+            if (!ImportedCodes.empty()) {
+                int i = 0;
+                std::unordered_map<std::string, int> nameCounts;
+                for (auto it = ImportedCodes.begin(); it != ImportedCodes.end();) {
+                    CP_CameraSettings& cam = it->camera_settings;
+
+                    // Get the name of the camera
+                    std::string name = cam.name;
+
+                    nameCounts[name]++;
+
+                    // Append the count to the name if it's not unique
+                    if (nameCounts[name] > 1) {
+                        name = name + std::to_string(nameCounts[name]-1);
+                    }
+
+                    // Push ID with the modified name
+                    ImGui::PushID((name + std::to_string(i)).c_str());
+
+                    // Begin child with the modified name
+                    ImGui::BeginChild("Border", it->is_open ? ImVec2{ 350.0f, 137.0f } : ImVec2{ 350, 35.0f }, true);
+
+                    // Check if Remove button is pressed
+                    if (ImGui::Button("Remove")) {
+                        it = ImportedCodes.erase(it);  // Erase and update iterator
+                        ImGui::PopID();
+                        ImGui::EndChild();
+                        continue;
+                    }
+
+                    // Display camera name
+                    ImGui::SameLine();
+                    it->is_open = ImGui::TreeNode(name.c_str());
+
+                    // Display camera settings if tree node is open
+                    if (it->is_open) {
+                        ImGui::TextUnformatted(("FOV: " + std::to_string(cam.FOV)).c_str());
+                        ImGui::TextUnformatted(("Distance: " + std::to_string(cam.Distance)).c_str());
+                        ImGui::TextUnformatted(("Height: " + std::to_string(cam.Height)).c_str());
+                        ImGui::TextUnformatted(("Stiffness: " + std::format("{}", cam.Stiffness)).c_str());
+                        ImGui::TextUnformatted(("SwivelSpeed: " + std::format("{}", cam.SwivelSpeed)).c_str());
+                        ImGui::TextUnformatted(("TransitionSpeed: " + std::format("{}", cam.TransitionSpeed)).c_str());
+                        ImGui::TreePop();
+                    }
+
+                    // End child and pop ID
+                    ImGui::EndChild();
+                    ImGui::PopID();
+
+                    // Move to the next camera
+                    i++;
+                    ++it;
+                }
+            }
+            if (ImGui::Button("Add All")) {
+
+                for (CP_ImportedCode code : ImportedCodes) {
+                    cameras.push_back(code.camera_settings);
+                }
+                settingsChanged = true;
+                ImportedCodes.clear();
+                ImportCode = false;
+                CodeAdder = "";
+            }
+            ImGui::EndTabItem();
         }
+        ImGui::Spacing();
         ImGui::Separator();
+        
         if (ImGui::Button("Close")) {
             ProPlayerCameras.clear();
             CreatePreset = false;
             InputNameError = false;
             PresetName.clear();
         }
-        ImGui::EndGroup();
+        
+        ImGui::EndTabBar();
         ImGui::End();
     }
 }

@@ -167,9 +167,9 @@ CameraPresets::CP_CameraSettings CameraPresets::parseCode(const std::string& inp
         settings.Distance = std::stoi(tokens[6]);
         settings.Height = std::stoi(tokens[2]);
         settings.Angle = std::stoi(tokens[3]);
-        settings.Stiffness = std::stof(tokens[4]);
-        settings.SwivelSpeed = std::stof(tokens[7]);
-        settings.TransitionSpeed = std::stof(tokens[5]);
+        settings.Stiffness = std::stof(std::format("{}", std::stof(tokens[4])));
+        settings.SwivelSpeed = std::stof(std::format("{}", std::stof(tokens[7])));
+        settings.TransitionSpeed = std::stof(std::format("{}", std::stof(tokens[5])));
         settings.code = input;
     }
     else {
