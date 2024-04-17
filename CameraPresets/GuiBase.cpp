@@ -25,23 +25,29 @@ void CameraPresets::RenderSettings() {
     });
     ImGui::Text("F5 is Window Bind");
 }
+
 void CameraPresets::RenderWindow() {
+    /// \TODO sleep
+    ///\Note FOV HEIGHT ANGLE STIFFNESS TRANSITIONSPEED DISTANCE SWIVELSPEED
+
     std::fstream inputFile(CameraFolder, std::ios::in);
     if (inputFile.is_open()) {
+        ///\TODO Hashmap to find same name presets 
         std::string line;
         while (std::getline(inputFile, line)) {
             std::istringstream iss(line);
             std::string playerName;
+
             std::vector <std::string> values;
-            // Extract the player name
             iss >> playerName;
-            // make sure there is actually a player there and not a new line character.
+
             if (playerName.empty()) break;
-            // Tokenize the rest of the line using spaces and store in a vector
+
             std::string word;
+
             while (iss >> word) values.push_back(word);
 
-            // dont continuously add the names by checking if they are already in the cameras vector
+            ///\Note dont continuously add the names by checking if they are already in the cameras vector
 
             bool playerExists = false;
             for (const auto& existingCamera : cameras) {
@@ -70,6 +76,14 @@ void CameraPresets::RenderWindow() {
     else {
         LOG("CameraPresets: Could not open file {}", "cameras_rlcs.data");
     }
+    // if there are 2 of the same name, give one of them a number
+    std::unordered_map<std::string, int> cams;
+    for (CP_CameraSettings& cam : cameras) {
+        cams[cam.name]++;
+        if (cams[cam.name] > 1) {
+            cam.name = cam.name + std::to_string(cams[cam.name]-1);
+        }
+    }
 
     if (settingsChanged) {
         std::string data;
@@ -91,13 +105,16 @@ void CameraPresets::RenderWindow() {
         ImGui::NextColumn();
         ImGui::SetColumnWidth(1, 35);
 
+        /// \Bug same name presets
+        /// \Note fixed -> line 80
+       
         if (!HideMovementButtons) {
             // if the preset is at the top, dont allow button up
+            //swap lower and current index
+            //decrease index to keep at same preset index
             if (selected > 0 && ImGui::ArrowButton(("up" + std::to_string(selected)).c_str(), ImGuiDir_Up)) {
-                //swap lower and current index
                 std::swap(cameras[selected], cameras[selected - 1]);
                 settingsChanged = true;
-                //decrease index to keep at same preset index
                 selected -= 1;
             }
         }
@@ -106,11 +123,11 @@ void CameraPresets::RenderWindow() {
 
         if (!HideMovementButtons) {
             // if the preset is at the bottom, dont allow button down
+            //swap lower and current index
+            //increase index to keep at same preset index
             if (selected < cameras.size() - 1 && ImGui::ArrowButton(("down" + std::to_string(selected)).c_str(), ImGuiDir_Down)) {
-                //swap lower and current index
                 std::swap(cameras[selected], cameras[selected + 1]);
                 settingsChanged = true;
-                //increase index to keep at same preset index
                 selected += 1;
             }
         }
@@ -182,7 +199,6 @@ void CameraPresets::RenderWindow() {
                 cameras.at(selected).TransitionSpeed = roundf(cameras.at(selected).TransitionSpeed * 10.0f) / 10.0f;
                 settingsChanged = true;
             } 
-            //FOV HEIGHT ANGLE STIFFNESS TRANSITIONSPEED DISTANCE SWIVELSPEED
             ImGui::EndChild();
 
             ImGui::Spacing();
@@ -357,14 +373,18 @@ void CameraPresets::RenderWindow() {
                 tempCamera.TransitionSpeed = roundf(tempCamera.TransitionSpeed * 10.0f) / 10.0f;
             }
             if (ImGui::Button("Add Preset")) {
-                //! Add Regex to name
+
+                
+                /// \TODO Implement Regex
+                /// \Notes ^([a-zA-Z0-9_.^!-]+)
                 bool containsSpace = false;
                 for (char c : PresetName) {
                     if (c == ' ') {
-                        containsSpace = true;
+                        containsSpace = true;  
                         break;
                     }
                 }
+
                 if (!PresetName.empty() && !containsSpace) {
                     cameras.push_back(tempCamera);
                     PresetName.clear();
@@ -401,6 +421,8 @@ void CameraPresets::RenderWindow() {
             if (ImGui::InputTextWithHint("Pro Name", "Enter Pro Player's name", &ProPlayerSearch)) {
                 ProPlayerCameras.clear();
                 ProPlayerCameras = GetProPreset(ProPlayerSearch, "CameraPresetsPros.txt");
+
+            ///\Note Clamp size to a max of 10 result cams
                 if (ProPlayerCameras.size() > 10) {
                     ProPlayerCameras.resize(10);
                 }
@@ -412,6 +434,10 @@ void CameraPresets::RenderWindow() {
             for (CP_CameraSettings cam : ProPlayerCameras) {
                 ImGui::PushID(cam.name.c_str());
                 if (ImGui::Button("Add")) {
+
+                    /// \Note Clear everything and add cam to cameras 
+                    /// \Note Update Settings
+                    
                     cameras.push_back(cam);
                     settingsChanged = true;
                     InputNameError = false;
@@ -430,21 +456,34 @@ void CameraPresets::RenderWindow() {
         if (ImGui::BeginTabItem("Freestylers")) {
 
             ImGui::BeginChild("CacheFreestylePlayers", ImVec2{ 350, 52 }, true, ImGuiWindowFlags_NoScrollbar);
-            ImGui::Text("Add Pro Player Presets: ");
-            if (ImGui::InputTextWithHint("Pro Name", "Enter Pro Player's name", &FreestylePlayerSearch)) {
+            ImGui::Text("Add Freestyler Presets: ");
+
+
+            if (ImGui::InputTextWithHint("Pro Name", "Enter Freestyler's name", &FreestylePlayerSearch)) {
                 FreestylePlayerCameras.clear();
                 FreestylePlayerCameras = GetProPreset(FreestylePlayerSearch, "CameraPresetsFS.txt");
+
+                ///\Note Clamp size to a max of 10 result cams
                 if (FreestylePlayerCameras.size() > 10) {
                     FreestylePlayerCameras.resize(10);
                 }
+                ///\Note new
+
+                if(FreestylePlayerSearch.empty()) {
+                    FreestylePlayerCameras.clear();
+                }
             }
             ImGui::EndChild();
-            ImVec2 size = { 350, (max(FreestylePlayerCameras.size(), 1) * 25.0f) + ImGui::CalcTextSize("P").y * 2 };
+            ImVec2 size = { 350, (max(FreestylePlayerCameras.size(), 1) * 25.0f) + ImGui::CalcTextSize("P").y * 2 }; // P is tallest Char
 
             ImGui::BeginChild("PlayerList", size, true, ImGuiWindowFlags_NoScrollbar);
             for (CP_CameraSettings cam : FreestylePlayerCameras) {
                 ImGui::PushID(cam.name.c_str());
                 if (ImGui::Button("Add")) {
+
+                    /// \Note Clear everything and add cam to cameras 
+                    /// \Note Update Settings
+                    
                     cameras.push_back(cam);
                     settingsChanged = true;
                     InputNameError = false;
@@ -455,7 +494,7 @@ void CameraPresets::RenderWindow() {
                 ImGui::Text(cam.name.c_str());
                 ImGui::PopID();
             }
-            if (!FreestylePlayerCameras.empty()) ImGui::Text("Provided by Liquipedia under CC-BY-SA 3.0");
+            if (!FreestylePlayerCameras.empty()) ImGui::Text("Looking for Freestylers to add to the list!\nPlease message me if youd like to be added.");
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
@@ -465,6 +504,7 @@ void CameraPresets::RenderWindow() {
             ImGui::BeginChild("Codes", ImVec2{350, 35}, true, ImGuiWindowFlags_NoScrollbar);
             ImGui::Columns(2, "AddCodes");
             if (ImGui::Button("Add Code")) {
+                /// \Note Retrieve all codes that fit within range
                 GetAllCodes(CodeAdder);
                 CodeAdder.clear();
             }
@@ -484,11 +524,11 @@ void CameraPresets::RenderWindow() {
                     // Append the count to the name if it's not unique
                     nameCounts[name]++;
 
-                    /*
-                        if theres more of the same name then get the amount of the same name and subtract
-                        Ex: Name, Name1, Name2, Name3
-                             (1)  (2)-1  (3)-1  (4)-1
-                    */
+                    
+                     ///\Note if theres more of the same name then get the amount of the same name and subtract
+                     ///\Note Ex: Name, Name1, Name2, Name3
+                     ///\Note      (1)  (2)-1  (3)-1  (4)-1
+                    
 
                     if (nameCounts[name] > 1) {
                         name = name + std::to_string(nameCounts[name]-1); 

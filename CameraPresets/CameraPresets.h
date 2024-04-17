@@ -58,7 +58,6 @@ class CameraPresets: public BakkesMod::Plugin::BakkesModPlugin
     std::vector<CP_CameraSettings> GetProPreset(std::string substring, const char* file);
     std::vector<CP_CameraSettings> ProPlayerCameras;
     std::vector<CP_CameraSettings> FreestylePlayerCameras;
-
     CP_CameraSettings parseCode(const std::string& input);
     void DumpSave(std::string data);
     void LoadSave();

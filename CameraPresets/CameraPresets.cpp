@@ -7,6 +7,8 @@ BAKKESMOD_PLUGIN(CameraPresets, "Change Camera Settings with ease", plugin_versi
 
 std::shared_ptr < CVarManagerWrapper > _globalCvarManager;
 
+/// \TODO FormatCamera()
+
 void CameraPresets::onLoad() {
     _globalCvarManager = cvarManager;
 
@@ -39,7 +41,6 @@ void CameraPresets::LoadSave() {
     }
     SaveToFile(data, "cameras_rlcs.data");
 }
-
 
 std::vector<CameraPresets::CP_CameraSettings> CameraPresets::GetProPreset(std::string substring, const char* file) {
     std::fstream inputFile(gameWrapper->GetDataFolder() / file, std::ios::in);
