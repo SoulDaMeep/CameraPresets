@@ -48,13 +48,17 @@ class CameraPresets: public BakkesMod::Plugin::BakkesModPlugin
     int selected = 0;
     int oldSelected = 0;
     std::string ProPlayerSearch;
+    std::string FreestylePlayerSearch;
+
     bool isValidCode(std::string code);
-    void DeletePlayerFromFile(std::string playername);
-    void SaveToFile(std::string data);
+    void DeletePlayerFromFile(std::string playername, const char* file);
+    void SaveToFile(std::string data, const char* file);
     void GetAllCodes(std::string inputcode);
     std::string CreateSettingString(CP_CameraSettings camera);
-    std::vector<CP_CameraSettings> GetProPreset(std::string substring);
+    std::vector<CP_CameraSettings> GetProPreset(std::string substring, const char* file);
     std::vector<CP_CameraSettings> ProPlayerCameras;
+    std::vector<CP_CameraSettings> FreestylePlayerCameras;
+
     CP_CameraSettings parseCode(const std::string& input);
     void DumpSave(std::string data);
     void LoadSave();

@@ -37,12 +37,12 @@ void CameraPresets::LoadSave() {
         }
         inputFile.close();
     }
-    SaveToFile(data);
+    SaveToFile(data, "cameras_rlcs.data");
 }
 
 
-std::vector<CameraPresets::CP_CameraSettings> CameraPresets::GetProPreset(std::string substring) {
-    std::fstream inputFile(gameWrapper->GetDataFolder() / "CameraPresets.txt", std::ios::in);
+std::vector<CameraPresets::CP_CameraSettings> CameraPresets::GetProPreset(std::string substring, const char* file) {
+    std::fstream inputFile(gameWrapper->GetDataFolder() / file, std::ios::in);
     std::vector<CP_CameraSettings> t_Cameras;
     if (inputFile.is_open()) {
         std::string line;
@@ -80,7 +80,7 @@ std::vector<CameraPresets::CP_CameraSettings> CameraPresets::GetProPreset(std::s
         inputFile.close();
     }
     else {
-        LOG("CameraPresets: Could not open file {}", "CameraPresets.txt");
+        LOG("CameraPresets: Could not open file {}", file);
     }
     return t_Cameras;
 }
@@ -97,23 +97,23 @@ std::string CameraPresets::CreateSettingString(CP_CameraSettings camera) {
     return formattedString.str();
 }
 
-void CameraPresets::SaveToFile(std::string data) {
+void CameraPresets::SaveToFile(std::string data, const char* file) {
     std::fstream outfile;
 
-    outfile.open(gameWrapper->GetDataFolder() / "cameras_rlcs.data", std::ios::out);
+    outfile.open(gameWrapper->GetDataFolder() / file, std::ios::out);
 
     if (outfile.is_open()) {
         outfile << data;
         outfile.close();
     }
     else {
-        LOG("CameraPresets: Could not open file {}", "cameras_rlcs.data");
+        LOG("CameraPresets: Could not open file {}", file);
     }
 }
 
-void CameraPresets::DeletePlayerFromFile(std::string playername) {
+void CameraPresets::DeletePlayerFromFile(std::string playername, const char* file) {
 
-    std::fstream inputFile(gameWrapper->GetDataFolder() / "cameras_rlcs.data", std::ios::in);
+    std::fstream inputFile(gameWrapper->GetDataFolder() / file, std::ios::in);
     std::string data;
 
     if (inputFile.is_open()) {
@@ -132,10 +132,10 @@ void CameraPresets::DeletePlayerFromFile(std::string playername) {
             }
         }
         inputFile.close();
-        SaveToFile(data);
+        SaveToFile(data, file);
     }
     else {
-        LOG("CameraPresets: Could not open file {}", "cameras_rlcs.data");
+        LOG("CameraPresets: Could not open file {}", file);
     }
 }
 
