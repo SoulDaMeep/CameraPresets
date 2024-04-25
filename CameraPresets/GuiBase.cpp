@@ -33,7 +33,6 @@ void CameraPresets::RenderWindow() {
 
     std::fstream inputFile(gameWrapper->GetDataFolder() / "cameras_rlcs.data", std::ios::in);
     if (inputFile.is_open()) {
-        ///\TODO Hashmap to find same name presets 
         std::string line;
         while (std::getline(inputFile, line)) {
             std::istringstream iss(line);
@@ -78,6 +77,8 @@ void CameraPresets::RenderWindow() {
         LOG("CameraPresets: Could not open file {}", "cameras_rlcs.data");
     }
     // if there are 2 of the same name, give one of them a number
+    ///\TODO unordered_map to find same name presets 
+    ///\Note Fixed
     std::unordered_map<std::string, int> cams;
     for (CP_CameraSettings& cam : cameras) {
         std::string originalName = cam.name;
