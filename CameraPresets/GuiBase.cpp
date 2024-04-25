@@ -1,7 +1,6 @@
 ﻿#include "pch.h"
 #include "GuiBase.h"
 #include "CameraPresets.h"
-#include "DynamicUpdating.h"
 
 namespace fs = std::filesystem;
 std::string SettingsWindowBase::GetPluginName() {
@@ -25,7 +24,7 @@ void CameraPresets::RenderSettings() {
     if (ImGui::Button("Open Presets Window")) gameWrapper->Execute([this](GameWrapper* gw) {
         _globalCvarManager->executeCommand("togglemenu " + GetMenuName());
     });
-    ImGui::Text("F5 is Window Bind");
+    ImGui::Text("F1 is Window Bind");
 }
 
 void CameraPresets::RenderWindow() {
@@ -59,7 +58,7 @@ void CameraPresets::RenderWindow() {
                 }
             }
 
-            if (!playerExists) {
+            if(!playerExists){
                 CP_CameraSettings camera = {
                     playerName,
                     std::stoi(values[0]),
@@ -81,10 +80,11 @@ void CameraPresets::RenderWindow() {
     // if there are 2 of the same name, give one of them a number
     std::unordered_map<std::string, int> cams;
     for (CP_CameraSettings& cam : cameras) {
-        cams[cam.name]++;
-        if (cams[cam.name] > 1) {
-            cam.name = cam.name + std::to_string(cams[cam.name]-1);
+        std::string originalName = cam.name;
+        while (cams.find(cam.name) != cams.end()) {
+            cam.name = originalName + std::to_string(++cams[originalName]-1);
         }
+        cams[originalName]++;
     }
 
     if (settingsChanged) {
@@ -279,7 +279,7 @@ void CameraPresets::RenderWindow() {
         ////////////////////////////////////////////Delete Button////////////////////////////////////////////
         if (ImGui::Button("Delete")) {
             if(!cameras.empty()){
-                DeletePlayerFromFile(cameras.at(selected).name, "cameras_rlcs.data");
+                DeletePlayerFromFile(cameras.at(selected).name, gameWrapper->GetDataFolder() / "cameras_rlcs.data");
                 std::string selectedName = cameras.at(selected).name;
                 auto position = std::find_if(cameras.begin(), cameras.end(), [selectedName](const CP_CameraSettings& camera) {
                     return camera.name == selectedName;

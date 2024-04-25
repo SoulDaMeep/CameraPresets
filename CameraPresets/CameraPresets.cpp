@@ -138,9 +138,9 @@ void CameraPresets::SaveToFile(std::string data, std::filesystem::path path) {
     }
 }
 
-void CameraPresets::DeletePlayerFromFile(std::string playername, const char* file) {
+void CameraPresets::DeletePlayerFromFile(std::string playername, std::filesystem::path path) {
 
-    std::fstream inputFile(gameWrapper->GetDataFolder() / file, std::ios::in);
+    std::fstream inputFile(path, std::ios::in);
     std::string data;
 
     if (inputFile.is_open()) {
@@ -159,10 +159,10 @@ void CameraPresets::DeletePlayerFromFile(std::string playername, const char* fil
             }
         }
         inputFile.close();
-        SaveToFile(data, file);
+        SaveToFile(data, path);
     }
     else {
-        LOG("CameraPresets: Could not open file {}", file);
+        LOG("CameraPresets: Could not open file {}", path.string());
     }
 }
 

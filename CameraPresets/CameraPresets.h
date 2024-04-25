@@ -10,7 +10,6 @@
 #include <Windows.h>
 #include "version.h"
 #include <filesystem>
-#include "DynamicUpdating.h"
 
 constexpr auto plugin_version = stringify(VERSION_MAJOR) "." stringify(VERSION_MINOR) "." stringify(VERSION_PATCH) "." stringify(VERSION_BUILD);
 
@@ -28,6 +27,7 @@ class CameraPresets: public BakkesMod::Plugin::BakkesModPlugin
  //FOV HEIGHT ANGLE STIFFNESS TRANSITIONSPEED DISTANCE SWIVELSPEED
     struct CP_CameraSettings {
         std::string name;
+
         int FOV;
         int Distance;
         int Height;
@@ -59,7 +59,7 @@ class CameraPresets: public BakkesMod::Plugin::BakkesModPlugin
     std::string FreestylePlayerSearch;
 
     bool isValidCode(std::string code);
-    void DeletePlayerFromFile(std::string playername, const char* file);
+    void DeletePlayerFromFile(std::string playername, std::filesystem::path path);
     void SaveToFile(std::string data, std::filesystem::path path);
     void GetAllCodes(std::string inputcode);
     std::string CreateSettingString(CP_CameraSettings camera);
@@ -68,17 +68,14 @@ class CameraPresets: public BakkesMod::Plugin::BakkesModPlugin
     std::vector<CP_CameraSettings> FreestylePlayerCameras;
     CP_CameraSettings parseCode(const std::string& input);
     void DumpSave(std::string data);
-    int days_diff(std::string day1, std::string day2);
     void LoadSave();
     std::vector<CP_ImportedCode> ImportedCodes;
     std::vector<CP_CameraSettings> cameras;
-    CP_Version GetVersion(std::string data);
-    std::string GetCurrentLocalTime();
     CP_CameraSettings PlayerCameraSettings;
     CP_CameraSettings tempCamera;
     std::string InputCode;
     std::string SearchName;
-    std::string bind = "F3";
+    std::string bind = "F1";
     std::string CodeAdder;
     std::string PresetName;
     std::string CameraFolder = (gameWrapper->GetDataFolder() / "cameras_rlcs.data").string();
