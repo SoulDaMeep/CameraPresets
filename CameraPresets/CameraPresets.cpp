@@ -12,7 +12,28 @@ std::shared_ptr < CVarManagerWrapper > _globalCvarManager;
 void CameraPresets::onLoad() {
     _globalCvarManager = cvarManager;
 
-    cvarManager->setBind("F5", "togglemenu CameraPresets");
+
+    cvarManager->setBind("F1", "togglemenu CameraPresets");
+
+    CurlRequest proReq;
+    proReq.url = "https://raw.githubusercontent.com/SoulDaMeep/CameraPresets/master/data/CameraPresets/CameraPresetsPros.txt";
+    HttpWrapper::SendCurlRequest(proReq, [this](int code, std::string result)
+        {
+            LOG("[CameraPresets] Repo-Req (Pros): {}", code);
+            if (code != 200) return;
+
+            SaveToFile(result, gameWrapper->GetDataFolder() / "CameraPresets" / "CameraPresetsPros.txt");
+
+    });
+    CurlRequest fsReq;
+    fsReq.url = "https://raw.githubusercontent.com/SoulDaMeep/CameraPresets/master/data/CameraPresets/CameraPresetsFS.txt";
+    HttpWrapper::SendCurlRequest(fsReq, [this](int code, std::string result) {
+        LOG("[CameraPresets] Repo-Req (FS): {}", code);
+        if (code != 200) return;
+
+        SaveToFile(result, gameWrapper->GetDataFolder() / "CameraPresets" / "CameraPresetsFS.txt");
+    });
+
 
     ProfileCameraSettings settings = gameWrapper->GetSettings().GetCameraSettings();
     PlayerCameraSettings.FOV = settings.FOV;
@@ -23,11 +44,12 @@ void CameraPresets::onLoad() {
     PlayerCameraSettings.SwivelSpeed = settings.SwivelSpeed;
     PlayerCameraSettings.TransitionSpeed = settings.TransitionSpeed;
     LoadSave();
+
 }
 void CameraPresets::LoadSave() {
     std::fstream inputFile;
     std::string data;
-    inputFile.open(gameWrapper->GetDataFolder() / "CameraPresets_Save.txt", std::ios::in);
+    inputFile.open(gameWrapper->GetDataFolder() / "CameraPresets" / "CameraPresets_Save.txt", std::ios::in);
     if (inputFile.is_open()) {
         std::string line;
         while (std::getline(inputFile, line)) {
@@ -39,15 +61,16 @@ void CameraPresets::LoadSave() {
         }
         inputFile.close();
     }
-    SaveToFile(data, "cameras_rlcs.data");
+    SaveToFile(data, gameWrapper->GetDataFolder() / "cameras_rlcs.data");
 }
 
+
 std::vector<CameraPresets::CP_CameraSettings> CameraPresets::GetProPreset(std::string substring, const char* file) {
-    std::fstream inputFile(gameWrapper->GetDataFolder() / file, std::ios::in);
+    std::fstream inputFile(gameWrapper->GetDataFolder() / "CameraPresets" / file, std::ios::in);
     std::vector<CP_CameraSettings> t_Cameras;
     if (inputFile.is_open()) {
         std::string line;
-
+        
         while (std::getline(inputFile, line)) {
             std::istringstream iss(line);
             std::string t_PlayerName;
@@ -61,10 +84,13 @@ std::vector<CameraPresets::CP_CameraSettings> CameraPresets::GetProPreset(std::s
             for (char c : t_Values[0]) {
                 temp += std::tolower(c);
             }
-            
+            std::string subTemp;
+            for (char c : substring) {
+                subTemp += std::tolower(c);
+            }
 
             CP_CameraSettings t_TempCamera;
-            if (temp.find(substring) != std::string::npos) {
+            if (temp.find(subTemp) != std::string::npos) {
                 t_TempCamera.name = t_Values[0];
                 t_TempCamera.FOV = std::stoi(t_Values[1]);
                 t_TempCamera.Distance = std::stoi(t_Values[6]);
@@ -98,17 +124,17 @@ std::string CameraPresets::CreateSettingString(CP_CameraSettings camera) {
     return formattedString.str();
 }
 
-void CameraPresets::SaveToFile(std::string data, const char* file) {
+void CameraPresets::SaveToFile(std::string data, std::filesystem::path path) {
     std::fstream outfile;
 
-    outfile.open(gameWrapper->GetDataFolder() / file, std::ios::out);
+    outfile.open(path, std::ios::out);
 
     if (outfile.is_open()) {
         outfile << data;
         outfile.close();
     }
     else {
-        LOG("CameraPresets: Could not open file {}", file);
+        LOG("CameraPresets: Could not open file {}", path.string());
     }
 }
 
@@ -183,7 +209,7 @@ CameraPresets::CP_CameraSettings CameraPresets::parseCode(const std::string& inp
 void CameraPresets::DumpSave(std::string data) {
     std::fstream outfile;
 
-    outfile.open(gameWrapper->GetDataFolder() / "CameraPresets_Save.txt", std::ios::out);
+    outfile.open(gameWrapper->GetDataFolder() / "CameraPresets" / "CameraPresets_Save.txt", std::ios::out);
     if (outfile.is_open()) {
         outfile << data;
         outfile.close();

@@ -1,7 +1,9 @@
 ﻿#include "pch.h"
 #include "GuiBase.h"
 #include "CameraPresets.h"
+#include "DynamicUpdating.h"
 
+namespace fs = std::filesystem;
 std::string SettingsWindowBase::GetPluginName() {
     return "CameraPresets";
 }
@@ -30,7 +32,7 @@ void CameraPresets::RenderWindow() {
     /// \TODO sleep
     ///\Note FOV HEIGHT ANGLE STIFFNESS TRANSITIONSPEED DISTANCE SWIVELSPEED
 
-    std::fstream inputFile(CameraFolder, std::ios::in);
+    std::fstream inputFile(gameWrapper->GetDataFolder() / "cameras_rlcs.data", std::ios::in);
     if (inputFile.is_open()) {
         ///\TODO Hashmap to find same name presets 
         std::string line;
@@ -90,7 +92,7 @@ void CameraPresets::RenderWindow() {
         for (CP_CameraSettings camera : cameras) {
             data += CreateSettingString(camera);
         }
-        SaveToFile(data, "cameras_rlcs.data");
+        SaveToFile(data, gameWrapper->GetDataFolder() / "cameras_rlcs.data");
         DumpSave(data);
         settingsChanged = false;
     }
