@@ -353,7 +353,7 @@ void CameraPresets::RenderWindow() {
             
             ImGui::BeginChild("Input", ImVec2{350, 220}, true, ImGuiWindowFlags_NoScrollbar);
 
-            if(InputNameError) ImGui::Text("Please input a proper name (no spaces)");
+            if(InputNameError) ImGui::Text("Invalid Name: ( 20 chars ) [ a-z A-z _.-^! ]");
 
             if(ImGui::InputText("Name", &PresetName)) {
                  tempCamera.name = PresetName;
@@ -380,22 +380,15 @@ void CameraPresets::RenderWindow() {
                 
                 /// \TODO Implement Regex
                 /// \Notes ^([a-zA-Z0-9_.^!-]+)
-                bool containsSpace = false;
-                for (char c : PresetName) {
-                    if (c == ' ') {
-                        containsSpace = true;  
-                        break;
-                    }
-                }
-
-                if (!PresetName.empty() && !containsSpace) {
+                
+                const char* reg = R"(^[a-zA-Z0-9_.^!-]+$)";
+                std::regex pattern(reg);
+                if (std::regex_match(PresetName, pattern)&&PresetName.length() <= 20) {
                     cameras.push_back(tempCamera);
                     PresetName.clear();
                     settingsChanged = true;
                     InputNameError = false;
-                }
-                else InputNameError = true;
-                
+                } else InputNameError = true;
             }
 
 
