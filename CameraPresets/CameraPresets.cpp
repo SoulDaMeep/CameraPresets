@@ -12,8 +12,8 @@ std::shared_ptr < CVarManagerWrapper > _globalCvarManager;
 void CameraPresets::onLoad() {
     _globalCvarManager = cvarManager;
 
-
-    cvarManager->setBind("F1", "togglemenu CameraPresets");
+    cvarManager->registerCvar("CameraPresets_Bind", "F1", "Window bind for [CameraPresets]");
+    cvarManager->setBind("F1", "togglemenu " + GetMenuName());
 
     CurlRequest proReq;
     proReq.url = "https://raw.githubusercontent.com/SoulDaMeep/CameraPresets/master/data/CameraPresets/CameraPresetsPros.txt";

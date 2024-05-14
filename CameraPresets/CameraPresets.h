@@ -74,11 +74,19 @@ class CameraPresets: public BakkesMod::Plugin::BakkesModPlugin
     CP_CameraSettings PlayerCameraSettings;
     CP_CameraSettings tempCamera;
     std::string InputCode;
+    ImGuiStyle CameraPresetsStyle;
+
     std::string SearchName;
     std::string bind = "F1";
     std::string CodeAdder;
     std::string PresetName;
     std::string CameraFolder = (gameWrapper->GetDataFolder() / "cameras_rlcs.data").string();
+    
+    ImVec4 accent = ImVec4(9 / 255.f, 204.f / 255.f, 162.f / 255.f, 0.70f);
+    ImVec4 hover = ImVec4{ 17.f / 255.f, 167.f / 255.f, 140.f / 255.f, 1.0f };
+    ImVec4 primary = ImVec4(2.f / 255.f, 190.f / 255.f, 190.f / 255.f, 0.50f);
+
+    ImGuiStyle backup;
 public:
     void RenderSettings() override; // Uncomment if you wanna render your own tab in the settings menu
     void RenderWindow() override; // Uncomment if you want to render your own plugin window

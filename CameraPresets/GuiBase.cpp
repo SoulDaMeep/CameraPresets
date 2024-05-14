@@ -24,12 +24,85 @@ void CameraPresets::RenderSettings() {
     if (ImGui::Button("Open Presets Window")) gameWrapper->Execute([this](GameWrapper* gw) {
         _globalCvarManager->executeCommand("togglemenu " + GetMenuName());
     });
-    ImGui::Text("F1 is Window Bind");
+    ImGui::TextColored(ImVec4{255, 0, 0, 255}, "Bind: F1");
 }
 
 void CameraPresets::RenderWindow() {
-    /// \TODO sleep
-    ///\Note FOV HEIGHT ANGLE STIFFNESS TRANSITIONSPEED DISTANCE SWIVELSPEED
+
+
+
+    // Window styling to make it xtruh kewl
+
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    ImGuiStyle& CameraPresetsStyle = ImGui::GetStyle();
+    backup = style;
+    ImVec4* colors = CameraPresetsStyle.Colors;
+
+
+
+    colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+    colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+
+    colors[ImGuiCol_WindowBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+    colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+    colors[ImGuiCol_PopupBg] = ImVec4(0.19f, 0.19f, 0.19f, 0.92f);
+
+    colors[ImGuiCol_Border] = ImVec4{17.f / 255.f, 167.f / 255.f, 140.f/ 255.f, 0.20f};
+    colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.24f);
+
+    colors[ImGuiCol_FrameBg] = ImVec4(0.05f, 0.05f, 0.05f, 0.54f);
+    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.19f, 0.19f, 0.19f, 0.54f);
+    colors[ImGuiCol_FrameBgActive] = ImVec4(0.20f, 0.22f, 0.23f, 1.00f);
+    
+    colors[ImGuiCol_TitleBg] = primary;
+    colors[ImGuiCol_TitleBgActive] = accent;
+    colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
+
+    colors[ImGuiCol_MenuBarBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+
+    colors[ImGuiCol_ScrollbarBg] = ImVec4(0.05f, 0.05f, 0.05f, 0.54f);
+    colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.34f, 0.34f, 0.34f, 0.54f);
+    colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.40f, 0.40f, 0.40f, 0.54f);
+    colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.56f, 0.56f, 0.56f, 0.54f);
+
+    colors[ImGuiCol_SliderGrab] = primary;
+    colors[ImGuiCol_SliderGrabActive] = accent;
+
+    colors[ImGuiCol_Button] = primary;
+    colors[ImGuiCol_ButtonHovered] = hover;
+    colors[ImGuiCol_ButtonActive] = accent;
+
+    colors[ImGuiCol_Header] = primary;
+    colors[ImGuiCol_HeaderHovered] = hover;
+    colors[ImGuiCol_HeaderActive] = accent;
+
+    colors[ImGuiCol_Separator] = ImVec4(0.44f, 0.44f, 0.44f, 0.29f);
+    colors[ImGuiCol_SeparatorHovered] = ImVec4(0.44f, 0.44f, 0.44f, 0.29f);
+    colors[ImGuiCol_SeparatorActive] = ImVec4(0.40f, 0.44f, 0.47f, 1.00f);
+
+    colors[ImGuiCol_Tab] = primary;
+    colors[ImGuiCol_TabHovered] = hover;
+    colors[ImGuiCol_TabActive] = accent;
+    colors[ImGuiCol_TabUnfocused] = ImVec4(0.00f, 0.00f, 0.00f, 0.52f);
+    colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+
+    CameraPresetsStyle.FrameRounding = 4.0f;
+    CameraPresetsStyle.GrabRounding = 2.0f;
+    CameraPresetsStyle.TabRounding = 4.0f;
+    CameraPresetsStyle.WindowRounding = 6.0f;
+    CameraPresetsStyle.ScrollbarRounding = 3.0f;
+    CameraPresetsStyle.ItemSpacing = ImVec2(8.0f, 6.0f);
+    CameraPresetsStyle.WindowPadding = ImVec2(10.0f, 10.0f);
+    CameraPresetsStyle.FramePadding = ImVec2(6.0f, 4.0f);
+    CameraPresetsStyle.ScrollbarSize = 14.0f;
+    CameraPresetsStyle.TabBorderSize = 0.0f;
+    CameraPresetsStyle.WindowBorderSize = 0.0f;
+
+
+    style = CameraPresetsStyle;
+    
+    /// \Notes takes player from file and turns them into CP_CameraPreset struct
 
     std::fstream inputFile(gameWrapper->GetDataFolder() / "cameras_rlcs.data", std::ios::in);
     if (inputFile.is_open()) {
@@ -47,7 +120,7 @@ void CameraPresets::RenderWindow() {
 
             while (iss >> word) values.push_back(word);
 
-            ///\Note dont continuously add the names by checking if they are already in the cameras vector
+            // Note dont continuously add the names by checking if they are already in the cameras vector
 
             bool playerExists = false;
             for (const auto& existingCamera : cameras) {
@@ -74,12 +147,12 @@ void CameraPresets::RenderWindow() {
         inputFile.close();
     }
     else {
-        LOG("CameraPresets: Could not open file {}", "cameras_rlcs.data");
+        LOG("[CameraPresets] Could not open file {}", "cameras_rlcs.data");
     }
+
     // if there are 2 of the same name, give one of them a number
-    ///\TODO unordered_map to find same name presets 
-    ///\Note Fixed
     std::unordered_map<std::string, int> cams;
+
     for (CP_CameraSettings& cam : cameras) {
         std::string originalName = cam.name;
         while (cams.find(cam.name) != cams.end()) {
@@ -107,9 +180,6 @@ void CameraPresets::RenderWindow() {
         ImGui::InputText("Search", &SearchName);
         ImGui::NextColumn();
         ImGui::SetColumnWidth(1, 35);
-
-        /// \Bug same name presets
-        /// \Note fixed -> line 80
        
         if (!HideMovementButtons) {
             // if the preset is at the top, dont allow button up
@@ -170,7 +240,7 @@ void CameraPresets::RenderWindow() {
                 oldSelected = selected;
             }
             ImGui::BeginGroup();
-            ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), true); // Leave room for 1 line below us
+            ImGui::BeginChild("item view", ImVec2(0, 200), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse); // Leave room for 1 line below us
 
             ImGui::Text(cameras.at(selected).name.c_str());
             ImGui::Separator();
@@ -201,10 +271,9 @@ void CameraPresets::RenderWindow() {
             if (ImGui::SliderFloat("TransitionSpeed", &cameras.at(selected).TransitionSpeed, 1.0f, 2.0f, "%.2f")) {
                 cameras.at(selected).TransitionSpeed = roundf(cameras.at(selected).TransitionSpeed * 10.0f) / 10.0f;
                 settingsChanged = true;
-            } 
+            }
             ImGui::EndChild();
-
-            ImGui::Spacing();
+            ImGui::EndChild();
             ////////////////////////////////////////////Copy Code Text////////////////////////////////////////////
             CP_CameraSettings cc = cameras.at(selected);
             std::string code = cc.name + '#'
@@ -217,42 +286,21 @@ void CameraPresets::RenderWindow() {
                 + std::format("{}", cc.SwivelSpeed) + '|';
             cc.code = code;
 
-            ImVec2 textSize = ImGui::CalcTextSize(cc.code.c_str());
-            ImVec2 childSize = ImVec2{ textSize.x + 10, textSize.y + 10 }; 
-
-            ImVec2 parentChildWindowSize = {0, ImGui::GetWindowHeight()};
-            ImVec2 size = ImVec2{ textSize.x + 10, textSize.y + 10 };
-
-            ImVec2 childWindowPosition = ImVec2{ 10, parentChildWindowSize.y - childSize.y - 10 }; 
-
-            ImGui::SetCursorPos(childWindowPosition);
-
-            ImGui::BeginChild("TextPanel", childSize, true, ImGuiWindowFlags_NoScrollbar);
-
-            float moveUpAmount = (childSize.y - 20) * 0.5f;
-            ImGui::SetCursorPosY(ImGui::GetCursorPosY() - moveUpAmount - 1);
-            ImGui::SetCursorPosX(ImGui::GetCursorPosX() - 2.5);
-
-            ImGui::Text(cc.code.c_str());
-
-            ImGui::EndChild();
-
-            ImGui::SameLine();
             ///////////////////Copy Code Button///////////////////
-            if (ImGui::Button("Copy Code")) {
+            if (ImGui::Button(("Copy: " + cc.code).c_str())) {
                 ImGui::SetClipboardText(cc.code.c_str());
                 CopyCodeMessage = true;
                 gameWrapper->Execute([this](GameWrapper* gw) {
                     gameWrapper->SetTimeout([this](GameWrapper* gw) {
                         CopyCodeMessage = false;
-                    }, 2);
+                        }, 2);
                     // clear copy code message after 2 seconds
                 });
             }
-            if(CopyCodeMessage) ImGui::Text("You Copied The Code!");
-            
-            ImGui::EndChild();
+            if (CopyCodeMessage) ImGui::Text("Copied Code!");
+
             ImGui::EndGroup();
+
         }
         ////////////////////////////////////////////Add Preset Window////////////////////////////////////////////
         if (ImGui::Button("Add Camera Preset")) {
@@ -274,17 +322,17 @@ void CameraPresets::RenderWindow() {
         ImGui::SameLine();
         ////////////////////////////////////////////Clear Button////////////////////////////////////////////
         if (ImGui::Button("Clear All Presets")) DeleteWindow = true;
-        
+
         ImGui::SameLine();
 
         ////////////////////////////////////////////Delete Button////////////////////////////////////////////
         if (ImGui::Button("Delete")) {
-            if(!cameras.empty()){
+            if (!cameras.empty()) {
                 DeletePlayerFromFile(cameras.at(selected).name, gameWrapper->GetDataFolder() / "cameras_rlcs.data");
                 std::string selectedName = cameras.at(selected).name;
                 auto position = std::find_if(cameras.begin(), cameras.end(), [selectedName](const CP_CameraSettings& camera) {
                     return camera.name == selectedName;
-                });
+                    });
 
                 if (position != cameras.end()) {
                     cameras.erase(position);
@@ -310,15 +358,22 @@ void CameraPresets::RenderWindow() {
         ImGui::BulletText("Guide: NAME#FOV#HEIGHT#ANGLE#STIFFNESS#TRANSITIONSPEED#DISTANCE#SWIVELSPEED | \nExample: Squishy#110#90# -5#0.5#1.00#270#6.00");
         ImGui::Separator();
         ImGui::Text("Credits: ");
-        ImGui::Text("Kandda. - Concept and Thumbnail artist");
-        ImGui::Text("+left - Pro Camera Settings list");
-        ImGui::Text("Play Testers: ");
-        ImGui::Text("sslowdev");
-        ImGui::Text("Rivques");
-        ImGui::Text("Kandda.");
+        ImGui::Text("- Kandda. - Concept and Thumbnail artist");
+        ImGui::Text("- +left - Pro Camera Settings list");
+        ImGui::Text("- Play Testers: ");
+        ImGui::Text("- sslowdev");
+        ImGui::Text("- Rivques");
         ImGui::Separator();
-        ImGui::Text("Contact Info:");
-        ImGui::Text("Discord: @souldameep\nGithub: SoulDaMeep");
+        
+        ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 40);
+        if (ImGui::Button("Github: @souldameep")) {
+            system("start https://github.com/SoulDaMeep");
+        }
+        ImGui::SameLine();
+        if(ImGui::Button("Discord Server")) {
+            system("Start https://discord.gg/DuA6Efj54T");
+        }
+        
         ImGui::EndTabItem();
     }
 
@@ -351,7 +406,7 @@ void CameraPresets::RenderWindow() {
         ////////////////////////////////////////////Create: Custom Preset////////////////////////////////////////////
         if (ImGui::BeginTabItem("Custom")) {
             
-            ImGui::BeginChild("Input", ImVec2{350, 220}, true, ImGuiWindowFlags_NoScrollbar);
+            ImGui::BeginChild("Input", ImVec2{350, 260}, true, ImGuiWindowFlags_NoScrollbar);
 
             if(InputNameError) ImGui::Text("Invalid Name: ( 20 chars ) [ a-z A-z _.-^! ]");
 
@@ -376,10 +431,6 @@ void CameraPresets::RenderWindow() {
                 tempCamera.TransitionSpeed = roundf(tempCamera.TransitionSpeed * 10.0f) / 10.0f;
             }
             if (ImGui::Button("Add Preset")) {
-
-                
-                /// \TODO Implement Regex
-                /// \Notes ^([a-zA-Z0-9_.^!-]+)
                 
                 const char* reg = R"(^[a-zA-Z0-9_.^!-]+$)";
                 std::regex pattern(reg);
@@ -412,28 +463,25 @@ void CameraPresets::RenderWindow() {
         }
         if (ImGui::BeginTabItem("Pros")) {
             ////////////////////////////////////////////Create: Pros Tab////////////////////////////////////////////
-            ImGui::BeginChild("CacheProPlayers", ImVec2{350, 52}, true, ImGuiWindowFlags_NoScrollbar);
+            ImGui::BeginChild("CacheProPlayers", ImVec2{350, 70}, true, ImGuiWindowFlags_NoScrollbar);
             ImGui::Text("Add Pro Player Presets: ");
             if (ImGui::InputTextWithHint("Pro Name", "Enter Pro Player's name", &ProPlayerSearch)) {
                 ProPlayerCameras.clear();
+
                 ProPlayerCameras = GetProPreset(ProPlayerSearch, "CameraPresetsPros.txt");
 
-            ///\Note Clamp size to a max of 10 result cams
-                if (ProPlayerCameras.size() > 10) {
-                    ProPlayerCameras.resize(10);
-                }
+                if (ProPlayerCameras.size() > 10) ProPlayerCameras.resize(10);
+                
             }
+            if(ProPlayerSearch.empty()) ProPlayerCameras.clear();
             ImGui::EndChild();
-            ImVec2 size = {350, (max(ProPlayerCameras.size(), 1) * 25.0f) + ImGui::CalcTextSize("P").y * 2};
+            ImVec2 size = {350, (max(ProPlayerCameras.size(), 1) * 27.5f) + ImGui::CalcTextSize("P").y * 2};
         
             ImGui::BeginChild("PlayerList", size, true, ImGuiWindowFlags_NoScrollbar);
             for (CP_CameraSettings cam : ProPlayerCameras) {
                 ImGui::PushID(cam.name.c_str());
-                if (ImGui::Button("Add")) {
 
-                    /// \Note Clear everything and add cam to cameras 
-                    /// \Note Update Settings
-                    
+                if (ImGui::Button("Add")) {
                     cameras.push_back(cam);
                     settingsChanged = true;
                     InputNameError = false;
@@ -451,35 +499,29 @@ void CameraPresets::RenderWindow() {
         ////////////////////////////////////////////Create: Freestylers Tab////////////////////////////////////////////
         if (ImGui::BeginTabItem("Freestylers")) {
 
-            ImGui::BeginChild("CacheFreestylePlayers", ImVec2{ 350, 52 }, true, ImGuiWindowFlags_NoScrollbar);
+            ImGui::BeginChild("CacheFreestylePlayers", ImVec2{ 350, 70 }, true, ImGuiWindowFlags_NoScrollbar);
             ImGui::Text("Add Freestyler Presets: ");
 
 
             if (ImGui::InputTextWithHint("Pro Name", "Enter Freestyler's name", &FreestylePlayerSearch)) {
                 FreestylePlayerCameras.clear();
+
                 FreestylePlayerCameras = GetProPreset(FreestylePlayerSearch, "CameraPresetsFS.txt");
 
-                ///\Note Clamp size to a max of 10 result cams
-                if (FreestylePlayerCameras.size() > 10) {
-                    FreestylePlayerCameras.resize(10);
-                }
-                ///\Note new
-
-                if(FreestylePlayerSearch.empty()) {
-                    FreestylePlayerCameras.clear();
-                }
+                if (FreestylePlayerCameras.size() > 10) FreestylePlayerCameras.resize(10);
+                
+                if(FreestylePlayerSearch.empty()) FreestylePlayerCameras.clear();
+                
             }
+            if(FreestylePlayerSearch.empty()) FreestylePlayerCameras.clear();
             ImGui::EndChild();
-            ImVec2 size = { 350, (max(FreestylePlayerCameras.size(), 1) * 25.0f) + ImGui::CalcTextSize("P").y * 2 }; // P is tallest Char
+            ImVec2 size = { 350, (max(FreestylePlayerCameras.size(), 1) * 27.5f) + ImGui::CalcTextSize("P").y * 3.35f }; // P is tallest Char
 
             ImGui::BeginChild("PlayerList", size, true, ImGuiWindowFlags_NoScrollbar);
             for (CP_CameraSettings cam : FreestylePlayerCameras) {
                 ImGui::PushID(cam.name.c_str());
-                if (ImGui::Button("Add")) {
 
-                    /// \Note Clear everything and add cam to cameras 
-                    /// \Note Update Settings
-                    
+                if (ImGui::Button("Add")) {
                     cameras.push_back(cam);
                     settingsChanged = true;
                     InputNameError = false;
@@ -497,10 +539,9 @@ void CameraPresets::RenderWindow() {
 
         if (ImGui::BeginTabItem("Codes")) {
             ////////////////////////////////////////////Create: Codes////////////////////////////////////////////
-            ImGui::BeginChild("Codes", ImVec2{350, 35}, true, ImGuiWindowFlags_NoScrollbar);
+            ImGui::BeginChild("Codes", ImVec2{350, 50}, true, ImGuiWindowFlags_NoScrollbar);
             ImGui::Columns(2, "AddCodes");
             if (ImGui::Button("Add Code")) {
-                /// \Note Retrieve all codes that fit within range
                 GetAllCodes(CodeAdder);
                 CodeAdder.clear();
             }
@@ -512,28 +553,34 @@ void CameraPresets::RenderWindow() {
             ImGui::EndChild();
             if (!ImportedCodes.empty()) {
                 int i = 0;
-                std::unordered_map<std::string, int> nameCounts;
+                //for (CP_CameraSettings& cam : cameras) {
+                //    std::string originalName = cam.name;
+                //    while (cams.find(cam.name) != cams.end()) {
+                //        cam.name = originalName + std::to_string(++cams[originalName] - 1);
+                //    }
+                //    cams[originalName]++;
+                //}
+                
                 for (auto it = ImportedCodes.begin(); it != ImportedCodes.end();) {
                     CP_CameraSettings& cam = it->camera_settings;
                     std::string name = cam.name;
 
                     // Append the count to the name if it's not unique
-                    nameCounts[name]++;
-
+                    
+                    while (cams.find(name) != cams.end()) {
+                        cam.name = name + std::to_string(++cams[name]-1);
+                    }
+                    cams[name]++;
                     
                      ///\Note if theres more of the same name then get the amount of the same name and subtract
                      ///\Note Ex: Name, Name1, Name2, Name3
                      ///\Note      (1)  (2)-1  (3)-1  (4)-1
                     
 
-                    if (nameCounts[name] > 1) {
-                        name = name + std::to_string(nameCounts[name]-1); 
-                    }
-
                     // Keep the id different from the others by including the index of the name.
                     ImGui::PushID((name + std::to_string(i)).c_str());
 
-                    ImGui::BeginChild("Border", it->is_open ? ImVec2{ 350.0f, 137.0f } : ImVec2{ 350, 35.0f }, true);
+                    ImGui::BeginChild("Border", it->is_open ? ImVec2{ 350.0f, 160.0f } : ImVec2{ 350, 45.0f }, true);
 
                     if (ImGui::Button("Remove")) {
                         it = ImportedCodes.erase(it);  // Erase and update iterator
@@ -568,6 +615,7 @@ void CameraPresets::RenderWindow() {
 
                 for (CP_ImportedCode code : ImportedCodes) {
                     cameras.push_back(code.camera_settings);
+                    settingsChanged = true;
                 }
                 settingsChanged = true;
                 ImportedCodes.clear();
@@ -589,6 +637,7 @@ void CameraPresets::RenderWindow() {
         ImGui::EndTabBar();
         ImGui::End();
     }
+    style = backup;
 }
 void PluginWindowBase::SetImGuiContext(uintptr_t ctx) {
     ImGui::SetCurrentContext(reinterpret_cast <ImGuiContext*> (ctx));
@@ -612,6 +661,15 @@ void PluginWindowBase::OnClose() {
 
 void PluginWindowBase::Render() {
     ImGui::SetNextWindowSize(ImVec2 {900, 400});
+    ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4{ 9 / 255.f, 204.f / 255.f, 162.f / 255.f, 0.70f });
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4{ 17.f / 255.f, 167.f / 255.f, 140.f / 255.f, 1.0f });
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.00f, 1.00f, 1.00f, 1.00f));
+    ImGui::PushStyleColor(ImGuiCol_TextDisabled, ImVec4(0.50f, 0.50f, 0.50f, 1.00f));
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.10f, 0.10f, 0.10f, 1.00f));
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.00f, 0.00f, 0.00f, 0.00f));
+    ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0.19f, 0.19f, 0.19f, 0.92f));
+    ImGui::PushStyleColor(ImGuiCol_Border, ImVec4{9 / 255.f, 204.f / 255.f, 162.f / 255.f, 0.70f});
+    ImGui::PushStyleColor(ImGuiCol_BorderShadow, ImVec4(0.00f, 0.00f, 0.00f, 0.24f));
     if (!ImGui::Begin(menuTitle_.c_str(), &isWindowOpen_, ImGuiWindowFlags_NoResize)) {
         // Early out if the window is collapsed, as an optimization.
         LOG("CameraPresets Collapse");
@@ -622,6 +680,17 @@ void PluginWindowBase::Render() {
     RenderWindow();
 
     ImGui::End();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+
+
     if (!isWindowOpen_) {
         _globalCvarManager->executeCommand("togglemenu " + GetMenuName());
     }
