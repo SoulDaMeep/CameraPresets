@@ -120,8 +120,6 @@ void CameraPresets::RenderWindow() {
 
             while (iss >> word) values.push_back(word);
 
-            // Note dont continuously add the names by checking if they are already in the cameras vector
-
             bool playerExists = false;
             for (const auto& existingCamera : cameras) {
                 if (existingCamera.name == playerName) {
@@ -364,7 +362,6 @@ void CameraPresets::RenderWindow() {
         ImGui::Text("- sslowdev");
         ImGui::Text("- Rivques");
         ImGui::Separator();
-        
         ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 40);
         if (ImGui::Button("Github: @souldameep")) {
             system("start https://github.com/SoulDaMeep");

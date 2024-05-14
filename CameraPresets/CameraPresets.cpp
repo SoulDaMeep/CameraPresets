@@ -12,7 +12,6 @@ std::shared_ptr < CVarManagerWrapper > _globalCvarManager;
 void CameraPresets::onLoad() {
     _globalCvarManager = cvarManager;
 
-    cvarManager->registerCvar("CameraPresets_Bind", "F1", "Window bind for [CameraPresets]");
     cvarManager->setBind("F1", "togglemenu " + GetMenuName());
 
     CurlRequest proReq;
@@ -107,7 +106,7 @@ std::vector<CameraPresets::CP_CameraSettings> CameraPresets::GetProPreset(std::s
         inputFile.close();
     }
     else {
-        LOG("CameraPresets: Could not open file {}", file);
+        LOG("[CameraPresets] Could not open file {}", file);
     }
     return t_Cameras;
 }
@@ -134,7 +133,7 @@ void CameraPresets::SaveToFile(std::string data, std::filesystem::path path) {
         outfile.close();
     }
     else {
-        LOG("CameraPresets: Could not open file {}", path.string());
+        LOG("[CameraPresets] Could not open file {}", path.string());
     }
 }
 
@@ -162,7 +161,7 @@ void CameraPresets::DeletePlayerFromFile(std::string playername, std::filesystem
         SaveToFile(data, path);
     }
     else {
-        LOG("CameraPresets: Could not open file {}", path.string());
+        LOG("[CameraPresets] Could not open file {}", path.string());
     }
 }
 
@@ -200,7 +199,7 @@ CameraPresets::CP_CameraSettings CameraPresets::parseCode(const std::string& inp
         settings.code = input;
     }
     else {
-        LOG("CameraPresets - Input failed");
+        LOG("[CameraPresets] Input failed");
     }
 
     return settings;
@@ -215,7 +214,7 @@ void CameraPresets::DumpSave(std::string data) {
         outfile.close();
     }
     else {
-        LOG("CameraPresets: Could not open file {}", "cameras_rlcs.data");
+        LOG("[CameraPresets] Could not open file {}", "cameras_rlcs.data");
     }
 }
 
@@ -238,7 +237,7 @@ void CameraPresets::GetAllCodes(std::string inputcode) {
             ImportedCodes.push_back(impCode);
         }
         else {
-            LOG("CameraPresets - Not Valid {}", value);
+            LOG("[CameraPresets] Not Valid {}", value);
         }
     }
 }
