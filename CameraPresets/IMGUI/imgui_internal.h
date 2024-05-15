@@ -1738,6 +1738,7 @@ namespace ImGui
     IMGUI_API void          PopFocusScope();
     inline ImGuiID          GetFocusScopeID()               { ImGuiContext& g = *GImGui; return g.NavFocusScopeId; }
 
+
     // Inputs
     // FIXME: Eventually we should aim to move e.g. IsActiveIdUsingKey() into IsKeyXXX functions.
     inline bool             IsActiveIdUsingNavDir(ImGuiDir dir)                         { ImGuiContext& g = *GImGui; return (g.ActiveIdUsingNavDirMask & (1 << dir)) != 0; }

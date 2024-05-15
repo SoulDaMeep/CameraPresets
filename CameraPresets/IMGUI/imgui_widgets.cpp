@@ -242,6 +242,98 @@ void ImGui::TextUnformatted(const char* text, const char* text_end)
     TextEx(text, text_end, ImGuiTextFlags_NoWidthForLargeClippedText);
 }
 
+void ImGui::CenteredSeparator(float width)
+{
+    ImGuiWindow* window = GetCurrentWindow();
+    if (window->SkipItems)
+        return;
+    ImGuiContext& g = *GImGui;
+    /*
+    // Commented out because it is not tested, but it should work, but it won't be centered
+    ImGuiWindowFlags flags = 0;
+    if ((flags & (ImGuiSeparatorFlags_Horizontal | ImGuiSeparatorFlags_Vertical)) == 0)
+        flags |= (window->DC.LayoutType == ImGuiLayoutType_Horizontal) ? ImGuiSeparatorFlags_Vertical : ImGuiSeparatorFlags_Horizontal;
+    IM_ASSERT(ImIsPowerOfTwo((int)(flags & (ImGuiSeparatorFlags_Horizontal | ImGuiSeparatorFlags_Vertical))));   // Check that only 1 option is selected
+    if (flags & ImGuiSeparatorFlags_Vertical)
+    {
+        VerticalSeparator();
+        return;
+    }
+    */
+
+    // Horizontal Separator
+    float x1, x2;
+    if (window->DC.CurrentColumns == NULL && (width == 0))
+    {
+        // Span whole window
+        ///x1 = window->Pos.x; // This fails with SameLine(); CenteredSeparator();
+        // Nah, we have to detect if we have a sameline in a different way
+        x1 = window->DC.CursorPos.x;
+        x2 = x1 + window->Size.x;
+    }
+    else
+    {
+        // Start at the cursor
+        x1 = window->DC.CursorPos.x;
+        if (width != 0) {
+            x2 = x1 + width;
+        }
+        else
+        {
+            x2 = window->ClipRect.Max.x;
+            // Pad right side of columns (except the last one)
+            if (window->DC.CurrentColumns && (window->DC.CurrentColumns->Current < window->DC.CurrentColumns->Count - 1))
+                x2 -= g.Style.ItemSpacing.x;
+        }
+    }
+    float y1 = window->DC.CursorPos.y + int(window->DC.CurrLineSize.y / 2.0f);
+    float y2 = y1 + 1.0f;
+
+    window->DC.CursorPos.x += width; //+ g.Style.ItemSpacing.x;
+
+    if (!window->DC.GroupStack.empty())
+        x1 += window->DC.Indent.x;
+
+    const ImRect bb(ImVec2(x1, y1), ImVec2(x2, y2));
+    ItemSize(ImVec2(0.0f, 0.0f)); // NB: we don't provide our width so that it doesn't get feed back into AutoFit, we don't provide height to not alter layout.
+    if (!ItemAdd(bb, NULL))
+    {
+        return;
+    }
+
+    window->DrawList->AddLine(bb.Min, ImVec2(bb.Max.x, bb.Min.y), GetColorU32(ImGuiCol_Border));
+
+    /* // Commented out because LogText is hard to reach outside imgui.cpp
+    if (g.LogEnabled)
+    LogText(IM_NEWLINE "--------------------------------");
+    */
+}
+
+void ImGui::SameLineSeparator(float width) {
+    ImGui::SameLine();
+    CenteredSeparator(width);
+}
+
+// Create a centered separator which can be immediately followed by a item
+void ImGui::PreSeparator(float width) {
+    ImGuiWindow* window = GetCurrentWindow();
+    if (window->DC.CurrLineSize.y == 0)
+        window->DC.CurrLineSize.y = ImGui::GetTextLineHeight();
+    CenteredSeparator(width);
+    ImGui::SameLine();
+}
+
+// The value for width is arbitrary. But it looks nice.
+void ImGui::TextSeparator(const char* text, float pre_width)
+{
+    ImGui::PreSeparator(pre_width);
+    ImGui::Text(text);
+    ImGui::SameLineSeparator();
+}
+
+
+
+
 void ImGui::Text(const char* fmt, ...)
 {
     va_list args;
@@ -250,6 +342,76 @@ void ImGui::Text(const char* fmt, ...)
     va_end(args);
 }
 
+
+void ImGui::SeparatorTextEx(ImGuiID id, const char* label, const char* label_end, float margin, float thickness)
+{
+    ImGuiContext& g = *GImGui;
+    ImGuiWindow* window = g.CurrentWindow;
+    ImGuiStyle& style = g.Style;
+
+    ImVec2 separatorpadding = {margin, 3.0f};
+    float separatorborder = thickness;
+    ImVec2 separatortextalign = {0.0f, 0.5f};
+
+    const ImVec2 label_size = CalcTextSize(label, label_end, false);
+    const ImVec2 pos = window->DC.CursorPos;
+    const ImVec2 padding = separatorpadding;
+
+    const float separator_thickness = separatorborder;
+    const ImVec2 min_size(label_size.x + padding.x * 2.0f, ImMax(label_size.y + padding.y * 2.0f, separator_thickness));
+    const ImRect bb(pos, ImVec2(window->WorkRect.Max.x, pos.y + min_size.y));
+
+    const float text_baseline_y = ImFloor((bb.GetHeight() - label_size.y) * separatortextalign.y + 0.99999f); //ImMax(padding.y, ImFloor((style.SeparatorTextSize - label_size.y) * 0.5f));
+    ItemSize(min_size);
+    if (!ItemAdd(bb, id))
+        return;
+
+    //const float sep1_spacing = (indent > 0.0f || Style_TextSeparatorAlign > 0.0f) ? style.ItemSpacing.x : 0.0f;
+    //const float sep2_spacing = (indent > 0.0f || Style_TextSeparatorAlign < 1.0f) ? style.ItemSpacing.x : 0.0f;
+
+    const float sep1_x1 = pos.x;
+    const float sep2_x2 = bb.Max.x;
+    const float seps_y = ImFloor((bb.Min.y + bb.Max.y) * 0.5f + 0.99999f);
+
+    const float label_avail_w = ImMax(0.0f, sep2_x2 - sep1_x1 - padding.x * 2.0f);
+    const ImVec2 label_pos(pos.x + padding.x + ImMax(0.0f, (label_avail_w - label_size.x) * separatortextalign.x), pos.y + text_baseline_y); // FIXME-ALIGN
+
+    const ImU32 separator_col = GetColorU32(ImGuiCol_Separator);
+    const ImU32 seperator_circle_col = GetColorU32(ImGuiCol_Separator);
+    if (label_size.x > 0.0f)
+    {
+        const float sep1_x2 = label_pos.x - style.ItemSpacing.x;
+        const float sep2_x1 = label_pos.x + label_size.x + style.ItemSpacing.x;
+        
+
+        if (sep1_x2 > sep1_x1 && separator_thickness > 0.0f)
+            window->DrawList->AddSegment(window->DrawList, ImVec2{sep1_x1, seps_y}, ImVec2{sep1_x2, seps_y}, separator_col, separator_thickness, 12.0f);
+        if (sep2_x2 > sep2_x1 && separator_thickness > 0.0f)
+            window->DrawList->AddSegment(window->DrawList, ImVec2{ sep2_x1, seps_y }, ImVec2{ sep2_x2, seps_y }, separator_col, separator_thickness, 12.0f);
+        RenderTextEllipsis(window->DrawList, label_pos, ImVec2(bb.Max.x, bb.Max.y + style.ItemSpacing.y), bb.Max.x, bb.Max.x, label, label_end, &label_size);
+    }
+    else
+    {
+
+        if (separator_thickness > 0.0f)
+            window->DrawList->AddLine(ImVec2(sep1_x1, seps_y), ImVec2(sep2_x2, seps_y), separator_col, separator_thickness);
+    }
+}
+
+void ImGui::SeparatorText(const char* label)
+{
+    ImGuiWindow* window = GetCurrentWindow();
+    if (window->SkipItems)
+        return;
+
+    // The SeparatorText() vs SeparatorTextEx() distinction is designed to be considerate that we may want:
+    // - allow headers to be draggable items (would require a stable ID + a noticeable highlight)
+    // - this high-level entry point to allow formatting? (may require ID separate from formatted string)
+    // - because of this we probably can't turn 'const char* label' into 'const char* fmt, ...'
+    // Otherwise, we can decide that users wanting to drag this would layout a dedicated drag-item,
+    // and then we can turn this into a format function.
+    SeparatorTextEx(0, label, FindRenderedTextEnd(label), 20.0f, 3.0f);
+}
 void ImGui::TextV(const char* fmt, va_list args)
 {
     ImGuiWindow* window = GetCurrentWindow();

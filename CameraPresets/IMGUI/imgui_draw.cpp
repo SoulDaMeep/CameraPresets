@@ -1000,7 +1000,39 @@ void ImDrawList::PathRect(const ImVec2& a, const ImVec2& b, float rounding, ImDr
         PathArcToFast(ImVec2(a.x + rounding_bl, b.y - rounding_bl), rounding_bl, 3, 6);
     }
 }
+void ImDrawList::AddSegment(ImDrawList* draw_list, ImVec2 start, ImVec2 end, ImU32 color, float thickness, float rounding, int num_segments)
+{
 
+        draw_list->DrawSemiCircle(draw_list, ImVec2(start.x, start.y+0.5f), thickness/2, color, false, 3.14159f / 2.0f, 12.0f);
+        draw_list->DrawSemiCircle(draw_list, ImVec2(end.x, end.y+0.5f), thickness/2, color, true, 3.14159f / 2.0f, 12.0f);
+        draw_list->AddLine(start, end, color, thickness);
+    
+}
+void ImDrawList::DrawSemiCircle(ImDrawList* draw_list, ImVec2 center, float radius, ImU32 color, bool top_half, float rotation, int num_segments)
+{
+    const float a_min = top_half ? IM_PI : 0.0f;
+    const float a_max = top_half ? IM_PI * 2.0f : IM_PI;
+    const float a_step = (a_max - a_min) / num_segments;
+
+    // Precompute sin and cos for rotation
+    const float cos_rot = cosf(rotation);
+    const float sin_rot = sinf(rotation);
+
+    draw_list->PathClear();
+    for (int i = 0; i <= num_segments; i++)
+    {
+        const float a = a_min + i * a_step;
+        float x = cosf(a) * radius;
+        float y = sinf(a) * radius;
+
+        // Apply rotation
+        float rotated_x = x * cos_rot - y * sin_rot;
+        float rotated_y = x * sin_rot + y * cos_rot;
+
+        draw_list->PathLineTo(ImVec2(center.x + rotated_x, center.y + rotated_y));
+    }
+    draw_list->PathFillConvex(color);
+}
 void ImDrawList::AddLine(const ImVec2& p1, const ImVec2& p2, ImU32 col, float thickness)
 {
     if ((col & IM_COL32_A_MASK) == 0)

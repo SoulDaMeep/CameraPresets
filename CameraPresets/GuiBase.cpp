@@ -2,6 +2,9 @@
 #include "GuiBase.h"
 #include "CameraPresets.h"
 
+
+
+
 namespace fs = std::filesystem;
 std::string SettingsWindowBase::GetPluginName() {
     return "CameraPresets";
@@ -65,7 +68,6 @@ void CameraPresets::RenderWindow() {
     colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.34f, 0.34f, 0.34f, 0.54f);
     colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.40f, 0.40f, 0.40f, 0.54f);
     colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.56f, 0.56f, 0.56f, 0.54f);
-
     colors[ImGuiCol_SliderGrab] = primary;
     colors[ImGuiCol_SliderGrabActive] = accent;
 
@@ -77,7 +79,7 @@ void CameraPresets::RenderWindow() {
     colors[ImGuiCol_HeaderHovered] = hover;
     colors[ImGuiCol_HeaderActive] = accent;
 
-    colors[ImGuiCol_Separator] = ImVec4(0.44f, 0.44f, 0.44f, 0.29f);
+    colors[ImGuiCol_Separator] =    accent;
     colors[ImGuiCol_SeparatorHovered] = ImVec4(0.44f, 0.44f, 0.44f, 0.29f);
     colors[ImGuiCol_SeparatorActive] = ImVec4(0.40f, 0.44f, 0.47f, 1.00f);
 
@@ -169,6 +171,8 @@ void CameraPresets::RenderWindow() {
         settingsChanged = false;
     }
     
+
+
     ImGui::BeginTabBar("Tab");
     if(ImGui::BeginTabItem("-Presets-")) {
         /////////////////////////////////////////////////////////Left Panel of Presets/////////////////////////////////////////////////////////
@@ -346,22 +350,20 @@ void CameraPresets::RenderWindow() {
     ////////////////////////////////////////////Help / Info ////////////////////////////////////////////
     if (ImGui::BeginTabItem("-Help/Info-")) {
         ImGui::Text("CameraPresets is a plugin that adds functionality and a user friendly GUI to the original outdated pro settings implemented by bakkesmod");
-        ImGui::Spacing();
         ImGui::Text("If you are a pro that wants their preset added to the list, upset because of a missing pro preset or if you found a bug, please contact me");
-        ImGui::Spacing();
         ImGui::Text("Please do not manually edit external files associated to this plugin. Your game may crash on startup.");
-        ImGui::Spacing();
-        ImGui::Separator();
-        ImGui::Text("Codes: ");
-        ImGui::BulletText("Guide: NAME#FOV#HEIGHT#ANGLE#STIFFNESS#TRANSITIONSPEED#DISTANCE#SWIVELSPEED | \nExample: Squishy#110#90# -5#0.5#1.00#270#6.00");
-        ImGui::Separator();
-        ImGui::Text("Credits: ");
+        ImGui::SeparatorText("Codes");
+        ImGui::Text("Guide: NAME#FOV#HEIGHT#ANGLE#STIFFNESS#TRANSITIONSPEED#DISTANCE#SWIVELSPEED | \nExample: Squishy#110#90# -5#0.5#1.00#270#6.00");
+        ImGui::SeparatorText("Honorable Mentions:");
         ImGui::Text("- Kandda. - Concept and Thumbnail artist");
-        ImGui::Text("- +left - Pro Camera Settings list");
-        ImGui::Text("- Play Testers: ");
+        ImGui::Text("- +left - Camera list lookup");
+        ImGui::Text("- Liquipedia - Player Data");
+        ImGui::SeparatorText("Play Testers");
         ImGui::Text("- sslowdev");
         ImGui::Text("- Rivques");
-        ImGui::Separator();
+        ImGui::Text("- Trxxy");
+        ImGui::SeparatorText("Socials");
+        
         ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 40);
         if (ImGui::Button("Github: @souldameep")) {
             system("start https://github.com/SoulDaMeep");

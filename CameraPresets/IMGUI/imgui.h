@@ -337,6 +337,7 @@ namespace ImGui
     IMGUI_API void          PushStyleVar(ImGuiStyleVar idx, const ImVec2& val);
     IMGUI_API void          PopStyleVar(int count = 1);
     IMGUI_API const ImVec4& GetStyleColorVec4(ImGuiCol idx);                                // retrieve style color as stored in ImGuiStyle structure. use to feed back into PushStyleColor(), otherwise use GetColorU32() to get style color with style alpha baked in.
+
     IMGUI_API ImFont*       GetFont();                                                      // get current font
     IMGUI_API float         GetFontSize();                                                  // get current font size (= height in pixels) of current font with current scale applied
     IMGUI_API ImVec2        GetFontTexUvWhitePixel();                                       // get UV coordinate for a while pixel, useful to draw custom shapes via the ImDrawList API
@@ -361,6 +362,13 @@ namespace ImGui
     // - The typical widget behavior is to output themselves at the current cursor position, then move the cursor one line down.
     // - You can call SameLine() between widgets to undo the last carriage return and output at the right of the preceeding widget.
     IMGUI_API void          Separator();                                                    // separator, generally horizontal. inside a menu bar or in horizontal layout mode, this becomes a vertical separator.
+    IMGUI_API void          TextSeparator(const char* text, float pre_width = 10.0f);
+    IMGUI_API void          PreSeparator(float width);
+    IMGUI_API void          SameLineSeparator(float width = 0);
+    IMGUI_API void          CenteredSeparator(float width = 0);
+    IMGUI_API void          SeparatorTextEx(ImGuiID id, const char* label, const char* label_end, float margin, float thickness);
+    IMGUI_API void          SeparatorText(const char* label);
+
     IMGUI_API void          SameLine(float offset_from_start_x=0.0f, float spacing=-1.0f);  // call between widgets or groups to layout them horizontally. X position given in window coordinates.
     IMGUI_API void          NewLine();                                                      // undo a SameLine() or force a new line when in an horizontal-layout context.
     IMGUI_API void          Spacing();                                                      // add vertical spacing.
@@ -1947,6 +1955,8 @@ struct ImDrawList
     // - For circle primitives, use "num_segments == 0" to automatically calculate tessellation (preferred). 
     //   In future versions we will use textures to provide cheaper and higher-quality circles. 
     //   Use AddNgon() and AddNgonFilled() functions if you need to guaranteed a specific number of sides.
+    IMGUI_API void  DrawSemiCircle(ImDrawList* draw_list, ImVec2 center, float radius, ImU32 color, bool top_half, float rotation, int num_segments = 12);
+    IMGUI_API void  AddSegment(ImDrawList* draw_list, ImVec2 start, ImVec2 end, ImU32 color, float thickness, float rounding, int num_segments = 12);
     IMGUI_API void  AddLine(const ImVec2& p1, const ImVec2& p2, ImU32 col, float thickness = 1.0f);
     IMGUI_API void  AddRect(const ImVec2& p_min, const ImVec2& p_max, ImU32 col, float rounding = 0.0f, ImDrawCornerFlags rounding_corners = ImDrawCornerFlags_All, float thickness = 1.0f);   // a: upper-left, b: lower-right (== upper-left + size), rounding_corners_flags: 4 bits corresponding to which corner to round
     IMGUI_API void  AddRectFilled(const ImVec2& p_min, const ImVec2& p_max, ImU32 col, float rounding = 0.0f, ImDrawCornerFlags rounding_corners = ImDrawCornerFlags_All);                     // a: upper-left, b: lower-right (== upper-left + size)
@@ -1964,6 +1974,7 @@ struct ImDrawList
     IMGUI_API void  AddPolyline(const ImVec2* points, int num_points, ImU32 col, bool closed, float thickness);
     IMGUI_API void  AddConvexPolyFilled(const ImVec2* points, int num_points, ImU32 col); // Note: Anti-aliased filling requires points to be in clockwise order.
     IMGUI_API void  AddBezierCurve(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col, float thickness, int num_segments = 0);
+
 
     // Image primitives
     // - Read FAQ to understand what ImTextureID is.
