@@ -79,7 +79,7 @@ void CameraPresets::RenderWindow() {
     colors[ImGuiCol_HeaderHovered] = hover;
     colors[ImGuiCol_HeaderActive] = accent;
 
-    colors[ImGuiCol_Separator] =    accent;
+    colors[ImGuiCol_Separator] =    primary;
     colors[ImGuiCol_SeparatorHovered] = ImVec4(0.44f, 0.44f, 0.44f, 0.29f);
     colors[ImGuiCol_SeparatorActive] = ImVec4(0.40f, 0.44f, 0.47f, 1.00f);
 
@@ -242,11 +242,11 @@ void CameraPresets::RenderWindow() {
                 oldSelected = selected;
             }
             ImGui::BeginGroup();
-            ImGui::BeginChild("item view", ImVec2(0, 200), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse); // Leave room for 1 line below us
+            ImGui::BeginChild("item view", ImVec2(0, 225), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse); // Leave room for 1 line below us
 
             ImGui::Text(cameras.at(selected).name.c_str());
             ImGui::Separator();
-            ImGui::BeginChild("sliders", ImVec2(0, 200));
+            ImGui::BeginChild("sliders", ImVec2(0, 225));
 
             if (ImGui::SliderInt("FOV", &cameras.at(selected).FOV, 60, 110)) {
                 settingsChanged = true;
