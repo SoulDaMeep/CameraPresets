@@ -648,7 +648,7 @@ void CameraPresets::RenderWindow() {
                     // Keep the id different from the others by including the index of the name.
                     ImGui::PushID((name + std::to_string(i)).c_str());
 
-                    ImGui::BeginChild("Border", it->is_open ? ImVec2{ 350, 160.0f } : ImVec2{ 250, 45.0f }, true);
+                    ImGui::BeginChild("Border", it->is_open ? ImVec2{ 350, 160.0f } : ImVec2{ 350, 45.0f }, true);
 
                     if (ImGui::Button("Remove")) {
                         it = ImportedCodes.erase(it);  // Erase and update iterator
