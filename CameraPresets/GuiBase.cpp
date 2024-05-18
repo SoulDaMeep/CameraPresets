@@ -247,17 +247,26 @@ void CameraPresets::RenderWindow() {
                     if (InputNameError == 2) {
                         ImGui::TextColored(ImVec4{1, 1, 0, 1}, "Invalid Name: ( 20 Chars ) [ a-z A-z _.-^! ]");
                     }
+                    else if (InputNameError == 3) {
+                        ImGui::TextColored(ImVec4{1, 1, 0, 1}, "Name already exists!");
+                    }
                     else ImGui::NewLine();
                     
                     if (ImGui::Button("Save")) {
                         const char* reg = R"(^[a-zA-Z0-9_.^!-]+$)";
                         std::regex pattern(reg);
 
-                        if (std::regex_match(RenameBuffer, pattern) && RenameBuffer.length() <= 20) {
+                        if(cams.count(RenameBuffer) >= 1 || RenameBuffer == camera.name) {
+                            InputNameError = 3;
+                            LOG("input name error 3");
+                        }
+                        else if (std::regex_match(RenameBuffer, pattern) && RenameBuffer.length() <= 20) {
                             FRenamePlayer(camera.name, RenameBuffer);
                             InputNameError = 0;
-                        } else InputNameError = 2;
-                        ImGui::CloseCurrentPopup();
+                            ImGui::CloseCurrentPopup();
+                        }
+                        else InputNameError = 2;
+                        
                     }
                     ImGui::SameLine();
                     if (ImGui::Button("Cancel"))
@@ -540,7 +549,7 @@ void CameraPresets::RenderWindow() {
             ImGui::Text("Add Freestyler Presets: ");
 
 
-            if (ImGui::InputTextWithHint("Pro Name", "Enter Freestyler's name", &FreestylePlayerSearch)) {
+            if (ImGui::InputTextWithHint("FS Name", "Enter Freestyler's name", &FreestylePlayerSearch)) {
                 FreestylePlayerCameras.clear();
 
                 FreestylePlayerCameras = GetProPreset(FreestylePlayerSearch, "CameraPresetsFS.txt");
