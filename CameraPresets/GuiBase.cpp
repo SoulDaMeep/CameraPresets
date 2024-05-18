@@ -27,7 +27,13 @@ void CameraPresets::RenderSettings() {
     if (ImGui::Button("Open Presets Window")) gameWrapper->Execute([this](GameWrapper* gw) {
         _globalCvarManager->executeCommand("togglemenu " + GetMenuName());
     });
-    ImGui::TextColored(ImVec4{255, 0, 0, 255}, "Bind: F1");
+
+    if (ImGui::IsItemHovered()) {
+        
+        ImGui::SetTooltip("Bind: F1");
+        
+    }
+
 }
 
 void CameraPresets::RenderWindow() {
@@ -101,7 +107,6 @@ void CameraPresets::RenderWindow() {
     CameraPresetsStyle.TabBorderSize = 0.0f;
     CameraPresetsStyle.WindowBorderSize = 0.0f;
 
-
     style = CameraPresetsStyle;
     
     /// \Notes takes player from file and turns them into CP_CameraPreset struct
@@ -170,11 +175,9 @@ void CameraPresets::RenderWindow() {
         DumpSave(data);
         settingsChanged = false;
     }
-    
-
 
     ImGui::BeginTabBar("Tab");
-    if(ImGui::BeginTabItem("-Presets-")) {
+    if(ImGui::BeginTabItem("Presets")) {
         /////////////////////////////////////////////////////////Left Panel of Presets/////////////////////////////////////////////////////////
         ImGui::BeginChild("left pane", ImVec2(250, -ImGui::GetFrameHeightWithSpacing()), true);
         ImGui::Columns(3, "MovementButtons", true);
@@ -210,6 +213,9 @@ void CameraPresets::RenderWindow() {
 
         ////////////////////////////////////////////Show Camera Presets in Side panel////////////////////////////////////////////
         if(cameras.empty()) HideMovementButtons = true;
+
+        if(RenameBuffer.empty() && !cameras.empty()) RenameBuffer = cameras.at(selected).name;
+
         for (int i = 0; i < cameras.size(); i++)
         {
             auto& camera = cameras[i];
@@ -229,14 +235,42 @@ void CameraPresets::RenderWindow() {
 
                 if (ImGui::Selectable(camera.name.c_str(), selected == i)) {
                     selected = i;
+                    RenameBuffer = camera.name;
+                }
+
+                ImGui::SetNextWindowSize(ImVec2{275, 112});
+                if (ImGui::BeginPopupContextWindow("Something"))
+                {
+                    ImGui::SeparatorText("Edit Name");
+                    ImGui::InputText("##edit", &RenameBuffer);
+
+                    if (InputNameError == 2) {
+                        ImGui::TextColored(ImVec4{1, 1, 0, 1}, "Invalid Name: ( 20 Chars ) [ a-z A-z _.-^! ]");
+                    }
+                    else ImGui::NewLine();
+                    
+                    if (ImGui::Button("Save")) {
+                        const char* reg = R"(^[a-zA-Z0-9_.^!-]+$)";
+                        std::regex pattern(reg);
+
+                        if (std::regex_match(RenameBuffer, pattern) && RenameBuffer.length() <= 20) {
+                            FRenamePlayer(camera.name, RenameBuffer);
+                            InputNameError = 0;
+                        } else InputNameError = 2;
+                        ImGui::CloseCurrentPopup();
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("Cancel"))
+                        ImGui::CloseCurrentPopup();
+                    ImGui::EndPopup();
                 }
                 ImGui::PopID();
             }
         }
         ImGui::EndChild();
-        ImGui::SameLine();
         ////////////////////////////////////////////Editable Sliders////////////////////////////////////////////
         if (selected < cameras.size()) {
+            ImGui::SameLine();
             if (oldSelected != selected) {
                 CopyCodeMessage = false;
                 oldSelected = selected;
@@ -344,11 +378,10 @@ void CameraPresets::RenderWindow() {
                 settingsChanged = true;
             }
         }
-
         ImGui::EndTabItem();
     }
     ////////////////////////////////////////////Help / Info ////////////////////////////////////////////
-    if (ImGui::BeginTabItem("-Help/Info-")) {
+    if (ImGui::BeginTabItem("Help/Info")) {
         ImGui::Text("CameraPresets is a plugin that adds functionality and a user friendly GUI to the original outdated pro settings implemented by bakkesmod");
         ImGui::Text("If you are a pro that wants their preset added to the list, upset because of a missing pro preset or if you found a bug, please contact me");
         ImGui::Text("Please do not manually edit external files associated to this plugin. Your game may crash on startup.");
@@ -378,6 +411,8 @@ void CameraPresets::RenderWindow() {
 
     ImGui::EndTabBar();
 
+
+
     ////////////////////////////////////////////Delete Window Popup////////////////////////////////////////////
     if (DeleteWindow) {
         ImGui::Begin("Delete ALL Presets", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
@@ -396,19 +431,22 @@ void CameraPresets::RenderWindow() {
         }
         ImGui::End();
     }
+
     ////////////////////////////////////////////Create Preset Window////////////////////////////////////////////
     if (CreatePreset) {
-        
         ImGui::Begin("Create Preset", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
         ImGui::BeginTabBar("CreateMenu");
         ////////////////////////////////////////////Create: Custom Preset////////////////////////////////////////////
         if (ImGui::BeginTabItem("Custom")) {
             
-            ImGui::BeginChild("Input", ImVec2{350, 260}, true, ImGuiWindowFlags_NoScrollbar);
+            ImGui::BeginChild("Input", ImVec2{350, (InputNameError == 1 ? 280.0f : 260.0f) }, true, ImGuiWindowFlags_NoScrollbar);
 
-            if(InputNameError) ImGui::Text("Invalid Name: ( 20 chars ) [ a-z A-z _.-^! ]");
-
+            if (InputNameError == 1) {
+                ImGui::TextColored(ImVec4{ 1, 0, 0, 1 }, "Invalid Name:");
+                ImGui::SameLine();
+                ImGui::TextColored(ImVec4{ 1, 1, 0, 1 }, "( 20 Chars ) [ a-z A-z _.-^! ]");
+            }
             if(ImGui::InputText("Name", &PresetName)) {
                  tempCamera.name = PresetName;
             }
@@ -437,8 +475,8 @@ void CameraPresets::RenderWindow() {
                     cameras.push_back(tempCamera);
                     PresetName.clear();
                     settingsChanged = true;
-                    InputNameError = false;
-                } else InputNameError = true;
+                    InputNameError = 0;
+                } else InputNameError = 1;
             }
 
 
@@ -535,41 +573,72 @@ void CameraPresets::RenderWindow() {
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
+        if (ImGui::BeginTabItem("Content Creators")) {
+            ImGui::BeginChild("CacheCCPlayers", ImVec2{ 350, 70 }, true, ImGuiWindowFlags_NoScrollbar);
+            ImGui::Text("Add Content Creater Presets: ");
 
+            if (ImGui::InputTextWithHint("CC Name", "Enter Content Creaters's name", &CCPlayerSearch)) {
+                CCPlayerCameras.clear();
+
+                CCPlayerCameras = GetProPreset(FreestylePlayerSearch, "CameraPresetsCC.txt");
+
+                if (CCPlayerCameras.size() > 10) CCPlayerCameras.resize(10);
+
+                if (CCPlayerSearch.empty()) CCPlayerCameras.clear();
+
+            }
+            if (CCPlayerSearch.empty()) CCPlayerCameras.clear();
+            ImGui::EndChild();
+            ImVec2 size = { 350, (max(CCPlayerCameras.size(), 1) * 27.5f) + ImGui::CalcTextSize("P").y * 3.35f }; // P is tallest Char
+
+            ImGui::BeginChild("PlayerList", size, true, ImGuiWindowFlags_NoScrollbar);
+            for (CP_CameraSettings cam : CCPlayerCameras) {
+                ImGui::PushID(cam.name.c_str());
+
+                if (ImGui::Button("Add")) {
+                    cameras.push_back(cam);
+                    settingsChanged = true;
+                    InputNameError = false;
+                    CCPlayerSearch.clear();
+                    CCPlayerCameras.clear();
+                }
+                ImGui::SameLine();
+                ImGui::Text(cam.name.c_str());
+                ImGui::PopID();
+            }
+            if (!CCPlayerCameras.empty()) ImGui::Text("Looking for Content Creaters to add to the list!\nPlease message me if youd like to be added.");
+            ImGui::EndChild();
+            ImGui::EndTabItem();
+        }
         if (ImGui::BeginTabItem("Codes")) {
             ////////////////////////////////////////////Create: Codes////////////////////////////////////////////
             ImGui::BeginChild("Codes", ImVec2{350, 50}, true, ImGuiWindowFlags_NoScrollbar);
             ImGui::Columns(2, "AddCodes");
             if (ImGui::Button("Add Code")) {
                 GetAllCodes(CodeAdder);
+                for (auto thing : ImportedCodes) {
+                    LOG("Thing: {}", thing.camera_settings.name);
+                }
                 CodeAdder.clear();
             }
-            ImGui::SetColumnWidth(0, 75);
+            ImGui::SetColumnWidth(0, 90);
             ImGui::NextColumn();
             ImGui::InputText("Enter Code", &CodeAdder);
-            ImGui::SetColumnWidth(1, 225);
+            ImGui::SetColumnWidth(1, 350-90);
             ImGui::Columns(1);
             ImGui::EndChild();
             if (!ImportedCodes.empty()) {
                 int i = 0;
-                //for (CP_CameraSettings& cam : cameras) {
-                //    std::string originalName = cam.name;
-                //    while (cams.find(cam.name) != cams.end()) {
-                //        cam.name = originalName + std::to_string(++cams[originalName] - 1);
-                //    }
-                //    cams[originalName]++;
-                //}
-                
+                std::unordered_map<std::string, int> cameraNames;
                 for (auto it = ImportedCodes.begin(); it != ImportedCodes.end();) {
                     CP_CameraSettings& cam = it->camera_settings;
                     std::string name = cam.name;
 
                     // Append the count to the name if it's not unique
-                    
-                    while (cams.find(name) != cams.end()) {
-                        cam.name = name + std::to_string(++cams[name]-1);
+                    cameraNames[name]++;
+                    if (cameraNames[name] > 1) {
+                        cam.name = name + std::to_string(cameraNames[name]-1);
                     }
-                    cams[name]++;
                     
                      ///\Note if theres more of the same name then get the amount of the same name and subtract
                      ///\Note Ex: Name, Name1, Name2, Name3
@@ -579,7 +648,7 @@ void CameraPresets::RenderWindow() {
                     // Keep the id different from the others by including the index of the name.
                     ImGui::PushID((name + std::to_string(i)).c_str());
 
-                    ImGui::BeginChild("Border", it->is_open ? ImVec2{ 350.0f, 160.0f } : ImVec2{ 350, 45.0f }, true);
+                    ImGui::BeginChild("Border", it->is_open ? ImVec2{ 350, 160.0f } : ImVec2{ 250, 45.0f }, true);
 
                     if (ImGui::Button("Remove")) {
                         it = ImportedCodes.erase(it);  // Erase and update iterator
@@ -632,7 +701,6 @@ void CameraPresets::RenderWindow() {
             InputNameError = false;
             PresetName.clear();
         }
-        
         ImGui::EndTabBar();
         ImGui::End();
     }

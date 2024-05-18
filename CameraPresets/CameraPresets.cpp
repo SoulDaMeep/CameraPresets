@@ -12,7 +12,9 @@ std::shared_ptr < CVarManagerWrapper > _globalCvarManager;
 void CameraPresets::onLoad() {
     _globalCvarManager = cvarManager;
 
-    cvarManager->setBind("F1", "togglemenu " + GetMenuName());
+    if (!cvarManager->getCvar("CameraPresets_Bind")) {
+        cvarManager->registerCvar("CameraPresets_Bind", "F1");
+    }
 
     CurlRequest proReq;
     proReq.url = "https://raw.githubusercontent.com/SoulDaMeep/CameraPresets/master/data/CameraPresets/CameraPresetsPros.txt";
@@ -32,7 +34,16 @@ void CameraPresets::onLoad() {
 
         SaveToFile(result, gameWrapper->GetDataFolder() / "CameraPresets" / "CameraPresetsFS.txt");
     });
+    CurlRequest CCReq;
+    CCReq.url = "https://raw.githubusercontent.com/SoulDaMeep/CameraPresets/master/data/CameraPresets/CameraPresetsCC.txt";
+    HttpWrapper::SendCurlRequest(CCReq, [this](int code, std::string result)
+        {
+            LOG("[CameraPresets] Repo-Req (CC): {}", code);
+            if (code != 200) return;
 
+            SaveToFile(result, gameWrapper->GetDataFolder() / "CameraPresets" / "CameraPresetsCC.txt");
+
+        });
 
     ProfileCameraSettings settings = gameWrapper->GetSettings().GetCameraSettings();
     PlayerCameraSettings.FOV = settings.FOV;
@@ -63,7 +74,39 @@ void CameraPresets::LoadSave() {
     SaveToFile(data, gameWrapper->GetDataFolder() / "cameras_rlcs.data");
 }
 
+void CameraPresets::FRenamePlayer(std::string playername, std::string nPlayername) {
+    std::fstream inputFile(gameWrapper->GetDataFolder() / "cameras_rlcs.data", std::ios::in);
+    std::string data;
 
+    if (inputFile.is_open()) {
+        std::string line;
+
+        while (std::getline(inputFile, line)) {
+            // Tokenize the line using spaces
+            std::istringstream iss(line);
+            std::string linePlayerName;
+
+            // Extract the first token
+            if (iss >> linePlayerName) {
+                if (linePlayerName != playername) {
+                    data += line + "\n";
+                }
+                else {
+                    std::string rol;
+                    std::getline(iss, rol);
+                    data += RenameBuffer + rol + "\n";
+                    cameras.at(selected).name = nPlayername;
+                }
+            }
+        }
+        inputFile.close();
+        SaveToFile(data, gameWrapper->GetDataFolder() / "cameras_rlcs.data");
+    }
+    else {
+        
+        LOG("[CameraPresets] Could not open file cameras_rlcs.data");
+    }
+}
 std::vector<CameraPresets::CP_CameraSettings> CameraPresets::GetProPreset(std::string substring, const char* file) {
     std::fstream inputFile(gameWrapper->GetDataFolder() / "CameraPresets" / file, std::ios::in);
     std::vector<CP_CameraSettings> t_Cameras;
@@ -233,7 +276,9 @@ void CameraPresets::GetAllCodes(std::string inputcode) {
         if (isValidCode(value + "|")) {
             LOG("Valid {}", value + "|");
             CP_CameraSettings camera = parseCode(value + "|");
+            LOG("Parsed {}", camera.name);
             CP_ImportedCode impCode = {camera, false};
+            
             ImportedCodes.push_back(impCode);
         }
         else {

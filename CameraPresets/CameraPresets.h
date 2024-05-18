@@ -49,23 +49,28 @@ class CameraPresets: public BakkesMod::Plugin::BakkesModPlugin
     bool CreatePreset = false;
     bool NoCodeError = false;
     bool CopyCodeMessage = false;
+    bool RenameModal = false;
     bool ImportCode = false;
     bool DeleteWindow = false;
     bool settingsChanged = false;
-    bool InputNameError = false;
+    int InputNameError = 0;
     int selected = 0;
     int oldSelected = 0;
     std::string ProPlayerSearch;
     std::string FreestylePlayerSearch;
+    std::string CCPlayerSearch;
+
 
     bool isValidCode(std::string code);
     void DeletePlayerFromFile(std::string playername, std::filesystem::path path);
     void SaveToFile(std::string data, std::filesystem::path path);
     void GetAllCodes(std::string inputcode);
+    void FRenamePlayer(std::string playername, std::string nPlayername);
     std::string CreateSettingString(CP_CameraSettings camera);
     std::vector<CP_CameraSettings> GetProPreset(std::string substring, const char* file);
     std::vector<CP_CameraSettings> ProPlayerCameras;
     std::vector<CP_CameraSettings> FreestylePlayerCameras;
+    std::vector<CP_CameraSettings> CCPlayerCameras;
     CP_CameraSettings parseCode(const std::string& input);
     void DumpSave(std::string data);
     void LoadSave();
@@ -75,9 +80,9 @@ class CameraPresets: public BakkesMod::Plugin::BakkesModPlugin
     CP_CameraSettings tempCamera;
     std::string InputCode;
     ImGuiStyle CameraPresetsStyle;
-
+    std::string RenameBuffer;
     std::string SearchName;
-    std::string bind = "F1";
+
     std::string CodeAdder;
     std::string PresetName;
     std::string CameraFolder = (gameWrapper->GetDataFolder() / "cameras_rlcs.data").string();
@@ -87,6 +92,7 @@ class CameraPresets: public BakkesMod::Plugin::BakkesModPlugin
     ImVec4 primary = ImVec4(2.f / 255.f, 190.f / 255.f, 190.f / 255.f, 0.50f);
 
     ImGuiStyle backup;
+	std::string Thing;
 public:
     void RenderSettings() override; // Uncomment if you wanna render your own tab in the settings menu
     void RenderWindow() override; // Uncomment if you want to render your own plugin window
