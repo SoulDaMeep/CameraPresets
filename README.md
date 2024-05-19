@@ -1,4 +1,4 @@
-CameraPresets is a plugin that gives a user friendly gui interaction for bakkesmod's implementation of camera presets
+CameraPresets is a Bakkesmod Plugin that adds customizable and user friendly interactions to the built in Bakkesmod Presets
 
 contact info: <br>
 Discord: [SoulDaMeep Discord Server](https://discord.gg/DuA6Efj54T)
