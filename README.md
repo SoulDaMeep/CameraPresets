@@ -1,18 +1,18 @@
 CameraPresets is a plugin that gives a user friendly gui interaction for bakkesmod's implementation of camera presets
 
 contact info: <br>
-Discord: @souldameep
+Discord: [SoulDaMeep Discord Server](https://discord.gg/DuA6Efj54T)
 
-Thank you to the following:
-> Kandda. : Concept Artist <br>
-> +left : Retrieving numeralable pro camera settings <br>
+Honorable Mentions: <br>
+> Kandda. : Concept Artist | Main Tester<br>
+> +left | Player lookup <br>
+> Liquipedia | Player Data <br>
 
 Play Testers: <br>
-> Kandda. <br>
 > Rivques <br>
 > Trxyy <br>
 > sslowdev <br>
-> +left <br>
+
 
 
 
