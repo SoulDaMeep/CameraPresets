@@ -85,17 +85,21 @@ void CameraPresets::FRenamePlayer(std::string playername, std::string nPlayernam
             // Tokenize the line using spaces
             std::istringstream iss(line);
             std::string linePlayerName;
-
+            
             // Extract the first token
             if (iss >> linePlayerName) {
+                LOG("lpn: {} | pn {}", linePlayerName, playername);
                 if (linePlayerName != playername) {
                     data += line + "\n";
                 }
                 else {
                     std::string rol;
                     std::getline(iss, rol);
-                    data += RenameBuffer + rol + "\n";
-                    cameras.at(selected).name = nPlayername;
+                    LOG("FOUND lpn: {} | pn {}", linePlayerName, playername);
+                    LOG("line: {}", rol);
+                    LOG("new line: {}", nPlayername + rol);
+                    data += nPlayername + rol + "\n";
+                    settingsChanged = true;
                 }
             }
         }
@@ -103,8 +107,7 @@ void CameraPresets::FRenamePlayer(std::string playername, std::string nPlayernam
         SaveToFile(data, gameWrapper->GetDataFolder() / "cameras_rlcs.data");
     }
     else {
-        
-        LOG("[CameraPresets] Could not open file cameras_rlcs.data");
+        LOG("[CameraPresets] Could not open file {}", "cameras_rlcs.data");
     }
 }
 std::vector<CameraPresets::CP_CameraSettings> CameraPresets::GetProPreset(std::string substring, const char* file) {

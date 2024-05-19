@@ -40,7 +40,7 @@ void CameraPresets::RenderWindow() {
 
 
 
-    // Window styling to make it xtruh kewl
+    // Windoh styling tu mak it xtruh kewl
 
 
     ImGuiStyle& style = ImGui::GetStyle();
@@ -126,7 +126,7 @@ void CameraPresets::RenderWindow() {
             std::string word;
 
             while (iss >> word) values.push_back(word);
-
+            LOG("Playername: [{}]", playerName);
             bool playerExists = false;
             for (const auto& existingCamera : cameras) {
                 if (existingCamera.name == playerName) {
@@ -190,7 +190,7 @@ void CameraPresets::RenderWindow() {
             // if the preset is at the top, dont allow button up
             //swap lower and current index
             //decrease index to keep at same preset index
-            if (selected > 0 && ImGui::ArrowButton(("up" + std::to_string(selected)).c_str(), ImGuiDir_Up)) {
+            if (selected > 0 && ImGui::ArrowButton(("up" + std::to_string(selected)).c_str(), ImGuiDir_Up) && cameras.size() > 0) {
                 std::swap(cameras[selected], cameras[selected - 1]);
                 settingsChanged = true;
                 selected -= 1;
@@ -235,12 +235,12 @@ void CameraPresets::RenderWindow() {
 
                 if (ImGui::Selectable(camera.name.c_str(), selected == i)) {
                     selected = i;
-                    RenameBuffer = camera.name;
+                    RenameBuffer = cameras.at(selected).name;
                 }
-
                 ImGui::SetNextWindowSize(ImVec2{275, 112});
                 if (ImGui::BeginPopupContextWindow("Something"))
                 {
+                    LOG("Camera Name: {}", cameras.at(selected).name);
                     ImGui::SeparatorText("Edit Name");
                     ImGui::InputText("##edit", &RenameBuffer);
 
@@ -261,7 +261,8 @@ void CameraPresets::RenderWindow() {
                             LOG("input name error 3");
                         }
                         else if (std::regex_match(RenameBuffer, pattern) && RenameBuffer.length() <= 20) {
-                            FRenamePlayer(camera.name, RenameBuffer);
+                            FRenamePlayer(cameras.at(selected).name, RenameBuffer);
+                            cameras.at(selected).name = RenameBuffer;
                             InputNameError = 0;
                             ImGui::CloseCurrentPopup();
                         }
@@ -372,17 +373,15 @@ void CameraPresets::RenderWindow() {
 
         ////////////////////////////////////////////Delete Button////////////////////////////////////////////
         if (ImGui::Button("Delete")) {
-            if (!cameras.empty()) {
+            if (!cameras.empty() && selected <= cameras.size()-1) {
                 DeletePlayerFromFile(cameras.at(selected).name, gameWrapper->GetDataFolder() / "cameras_rlcs.data");
                 std::string selectedName = cameras.at(selected).name;
                 auto position = std::find_if(cameras.begin(), cameras.end(), [selectedName](const CP_CameraSettings& camera) {
                     return camera.name == selectedName;
-                    });
+                });
 
-                if (position != cameras.end()) {
-                    cameras.erase(position);
-                }
-
+                if(selected == cameras.size() -1 ) selected--;
+                if (position != cameras.end()) cameras.erase(position);
                 //update settings
                 settingsChanged = true;
             }
@@ -397,7 +396,7 @@ void CameraPresets::RenderWindow() {
         ImGui::SeparatorText("Codes");
         ImGui::Text("Guide: NAME#FOV#HEIGHT#ANGLE#STIFFNESS#TRANSITIONSPEED#DISTANCE#SWIVELSPEED | \nExample: Squishy#110#90# -5#0.5#1.00#270#6.00");
         ImGui::SeparatorText("Honorable Mentions:");
-        ImGui::Text("- Kandda. - Concept and Thumbnail artist");
+        ImGui::Text("- Kandda. - Concept and Thumbnail artist | Main Tester");
         ImGui::Text("- +left - Camera list lookup");
         ImGui::Text("- Liquipedia - Player Data");
         ImGui::SeparatorText("Play Testers");
@@ -414,13 +413,10 @@ void CameraPresets::RenderWindow() {
         if(ImGui::Button("Discord Server")) {
             system("Start https://discord.gg/DuA6Efj54T");
         }
-        
         ImGui::EndTabItem();
     }
 
     ImGui::EndTabBar();
-
-
 
     ////////////////////////////////////////////Delete Window Popup////////////////////////////////////////////
     if (DeleteWindow) {
@@ -432,9 +428,7 @@ void CameraPresets::RenderWindow() {
         ImGui::SameLine();
         if (ImGui::Button("Delete All")) {
             DeleteWindow = false;
-            for (CP_CameraSettings cam : cameras) {
-                DeletePlayerFromFile(cam.name, "cameras_rlcs.data");
-            }
+            SaveToFile("", gameWrapper->GetDataFolder() / "cameras_rlcs.data");
             cameras.clear();
             settingsChanged = true;
         }
@@ -485,9 +479,9 @@ void CameraPresets::RenderWindow() {
                     PresetName.clear();
                     settingsChanged = true;
                     InputNameError = 0;
+                    CreatePreset = false;
                 } else InputNameError = 1;
             }
-
 
             ImGui::SameLine();
             ///////////////////Copy Current Button///////////////////
@@ -513,11 +507,8 @@ void CameraPresets::RenderWindow() {
             ImGui::Text("Add Pro Player Presets: ");
             if (ImGui::InputTextWithHint("Pro Name", "Enter Pro Player's name", &ProPlayerSearch)) {
                 ProPlayerCameras.clear();
-
                 ProPlayerCameras = GetProPreset(ProPlayerSearch, "CameraPresetsPros.txt");
-
                 if (ProPlayerCameras.size() > 10) ProPlayerCameras.resize(10);
-                
             }
             if(ProPlayerSearch.empty()) ProPlayerCameras.clear();
             ImGui::EndChild();
@@ -534,6 +525,7 @@ void CameraPresets::RenderWindow() {
                     ProPlayerSearch.clear();
                     ProPlayerCameras.clear();
                 }
+
                 ImGui::SameLine();
                 ImGui::Text(cam.name.c_str());
                 ImGui::PopID();
@@ -551,11 +543,8 @@ void CameraPresets::RenderWindow() {
 
             if (ImGui::InputTextWithHint("FS Name", "Enter Freestyler's name", &FreestylePlayerSearch)) {
                 FreestylePlayerCameras.clear();
-
                 FreestylePlayerCameras = GetProPreset(FreestylePlayerSearch, "CameraPresetsFS.txt");
-
                 if (FreestylePlayerCameras.size() > 10) FreestylePlayerCameras.resize(10);
-                
                 if(FreestylePlayerSearch.empty()) FreestylePlayerCameras.clear();
                 
             }
@@ -588,16 +577,14 @@ void CameraPresets::RenderWindow() {
 
             if (ImGui::InputTextWithHint("CC Name", "Enter Content Creaters's name", &CCPlayerSearch)) {
                 CCPlayerCameras.clear();
-
-                CCPlayerCameras = GetProPreset(FreestylePlayerSearch, "CameraPresetsCC.txt");
-
+                CCPlayerCameras = GetProPreset(CCPlayerSearch, "CameraPresetsCC.txt");
                 if (CCPlayerCameras.size() > 10) CCPlayerCameras.resize(10);
-
                 if (CCPlayerSearch.empty()) CCPlayerCameras.clear();
 
             }
             if (CCPlayerSearch.empty()) CCPlayerCameras.clear();
             ImGui::EndChild();
+
             ImVec2 size = { 350, (max(CCPlayerCameras.size(), 1) * 27.5f) + ImGui::CalcTextSize("P").y * 3.35f }; // P is tallest Char
 
             ImGui::BeginChild("PlayerList", size, true, ImGuiWindowFlags_NoScrollbar);
@@ -649,14 +636,7 @@ void CameraPresets::RenderWindow() {
                         cam.name = name + std::to_string(cameraNames[name]-1);
                     }
                     
-                     ///\Note if theres more of the same name then get the amount of the same name and subtract
-                     ///\Note Ex: Name, Name1, Name2, Name3
-                     ///\Note      (1)  (2)-1  (3)-1  (4)-1
-                    
-
-                    // Keep the id different from the others by including the index of the name.
                     ImGui::PushID((name + std::to_string(i)).c_str());
-
                     ImGui::BeginChild("Border", it->is_open ? ImVec2{ 350, 160.0f } : ImVec2{ 350, 45.0f }, true);
 
                     if (ImGui::Button("Remove")) {
