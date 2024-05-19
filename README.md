@@ -31,7 +31,7 @@ Thats right! Just search for you favorite player and you can instantly get their
 
 # Ok but how do I use it?
 ### Once you add a new preset, open the settings panel, slide down to your camera settings, and click the drop down to your new ease of access camera preset!
-![image](https://github.com/SoulDaMeep/CameraPresets/assets/80908765/971fa9c1-ce73-4d2f-b553-ae7c127a7d06)
+![image](https://github.com/SoulDaMeep/CameraPresets/assets/80908765/7d023e45-7540-46c1-b27c-969021a4073b)
 
 
 # What are "codes"?
