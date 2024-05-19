@@ -18,14 +18,15 @@ Play Testers: <br>
 
 
 # The Window
-![F5 to view your camera presets](https://github.com/SoulDaMeep/CameraPresets/assets/80908765/64280f1d-83e9-44e7-8894-244e2b42a321)
+![F1 to view your camera presets](https://github.com/SoulDaMeep/CameraPresets/assets/80908765/1d80a90f-3d80-462f-bee6-82dc67afe8f5)
+
 
 # Built in Pro Camera Presets
-Thats right! Just search for you favorite player and you can instantly get their camera preset!
+Thats right! Just search for you favorite player and you can instantly get their camera settings!
 
-![image](https://github.com/SoulDaMeep/CameraPresets/assets/80908765/bcd5bf77-369f-43ff-9905-10d251ed738d)
+![image](https://github.com/SoulDaMeep/CameraPresets/assets/80908765/3727c90f-e5d5-476f-881d-e52f87d36963)
 
-### I am sorry if your favorite pro is not in the list! There is alot of pros. Message me to add your favorite pro if you cannot find them in the list!
+### I am sorry if your favorite player is not in the list! There is alot of players. Message me to add your favorite pro if you cannot find them in the list!
 ### Remember! It is case sensitive!
 
 # Ok but how do I use it?
