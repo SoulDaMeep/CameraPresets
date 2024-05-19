@@ -107,7 +107,7 @@ void CameraPresets::RenderWindow() {
 
     style = CameraPresetsStyle;
     
-    /// \Notes takes player from file and turns them into CP_CameraPreset struct
+    // Turn the file text into CP_CameraSettings
 
     std::fstream inputFile(gameWrapper->GetDataFolder() / "cameras_rlcs.data", std::ios::in);
     if (inputFile.is_open()) {
@@ -153,7 +153,7 @@ void CameraPresets::RenderWindow() {
         LOG("[CameraPresets] Could not open file {}", "cameras_rlcs.data");
     }
 
-    // if there are 2 of the same name, give one of them a number
+    // If there are similar named presets, give them a different naem by appending the count of them.
     std::unordered_map<std::string, int> cams;
 
     for (CP_CameraSettings& cam : cameras) {
@@ -164,6 +164,7 @@ void CameraPresets::RenderWindow() {
         cams[originalName]++;
     }
 
+    // syncs external and internal
     if (settingsChanged) {
         std::string data;
         for (CP_CameraSettings camera : cameras) {
@@ -184,10 +185,8 @@ void CameraPresets::RenderWindow() {
         ImGui::NextColumn();
         ImGui::SetColumnWidth(1, 35);
        
+       // buttons to shift the preset down or up
         if (!HideMovementButtons) {
-            // if the preset is at the top, dont allow button up
-            //swap lower and current index
-            //decrease index to keep at same preset index
             if (selected > 0 && ImGui::ArrowButton(("up" + std::to_string(selected)).c_str(), ImGuiDir_Up) && cameras.size() > 0) {
                 std::swap(cameras[selected], cameras[selected - 1]);
                 settingsChanged = true;
@@ -198,9 +197,6 @@ void CameraPresets::RenderWindow() {
         ImGui::SetColumnWidth(2, 35);
 
         if (!HideMovementButtons) {
-            // if the preset is at the bottom, dont allow button down
-            //swap lower and current index
-            //increase index to keep at same preset index
             if (selected < cameras.size() - 1 && ImGui::ArrowButton(("down" + std::to_string(selected)).c_str(), ImGuiDir_Down)) {
                 std::swap(cameras[selected], cameras[selected + 1]);
                 settingsChanged = true;
@@ -236,6 +232,7 @@ void CameraPresets::RenderWindow() {
                     RenameBuffer = cameras.at(selected).name;
                 }
                 ImGui::SetNextWindowSize(ImVec2{275, 112});
+                // renaming 
                 if (ImGui::BeginPopupContextWindow("Something"))
                 {
                     LOG("Camera Name: {}", cameras.at(selected).name);
@@ -284,22 +281,24 @@ void CameraPresets::RenderWindow() {
                 oldSelected = selected;
             }
             ImGui::BeginGroup();
-            ImGui::BeginChild("item view", ImVec2(0, 225), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse); // Leave room for 1 line below us
+            ImGui::BeginChild("item view", ImVec2(0, 225), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
             ImGui::Text(cameras.at(selected).name.c_str());
             ImGui::Separator();
             ImGui::BeginChild("sliders", ImVec2(0, 225));
 
+            // sliders that clamp to ingame values
+
             if (ImGui::SliderInt("FOV", &cameras.at(selected).FOV, 60, 110)) {
                 settingsChanged = true;
             }
             if (ImGui::SliderInt("Distance", &cameras.at(selected).Distance, 100, 400)) {
-                cameras.at(selected).Distance = (cameras.at(selected).Distance / 10) * 10; // clamp between 10
+                cameras.at(selected).Distance = (cameras.at(selected).Distance / 10) * 10; 
                 settingsChanged = true;
 
             }
             if (ImGui::SliderInt("Height", &cameras.at(selected).Height, 40, 200)) {
-                cameras.at(selected).Height = (cameras.at(selected).Height / 10) * 10; // clamp between 10
+                cameras.at(selected).Height = (cameras.at(selected).Height / 10) * 10; 
                 settingsChanged = true;
             }
             ImGui::SliderInt("Angle", &cameras.at(selected).Angle, -15, 0);
@@ -319,6 +318,8 @@ void CameraPresets::RenderWindow() {
             ImGui::EndChild();
             ImGui::EndChild();
             ////////////////////////////////////////////Copy Code Text////////////////////////////////////////////
+
+            // button that allows the user to copy said presets code
             CP_CameraSettings cc = cameras.at(selected);
             std::string code = cc.name + '#'
                 + std::to_string(cc.FOV) + '#'
@@ -347,6 +348,8 @@ void CameraPresets::RenderWindow() {
 
         }
         ////////////////////////////////////////////Add Preset Window////////////////////////////////////////////
+
+        // sets the sliders values to the current users camera settings (QoL)
         if (ImGui::Button("Add Camera Preset")) {
             gameWrapper->Execute([this](GameWrapper* gw) {
                 ProfileCameraSettings settings = gameWrapper->GetSettings().GetCameraSettings();
@@ -370,8 +373,11 @@ void CameraPresets::RenderWindow() {
         ImGui::SameLine();
 
         ////////////////////////////////////////////Delete Button////////////////////////////////////////////
+        // checks if the camera array is 0
+        // if the user is deleting last preset, shift the selected value up by 1
+        // prevents from having selected be a value outside of the array
         if (ImGui::Button("Delete")) {
-            if (!cameras.empty() && selected <= cameras.size()-1) {
+            if (!cameras.empty()) {
                 DeletePlayerFromFile(cameras.at(selected).name, gameWrapper->GetDataFolder() / "cameras_rlcs.data");
                 std::string selectedName = cameras.at(selected).name;
                 auto position = std::find_if(cameras.begin(), cameras.end(), [selectedName](const CP_CameraSettings& camera) {
@@ -387,6 +393,8 @@ void CameraPresets::RenderWindow() {
         ImGui::EndTabItem();
     }
     ////////////////////////////////////////////Help / Info ////////////////////////////////////////////
+
+    // SeperatorText took me too long i dont even wanna talk about it
     if (ImGui::BeginTabItem("Help/Info")) {
         ImGui::Text("CameraPresets is a plugin that adds functionality and a user friendly GUI to the original outdated pro settings implemented by bakkesmod");
         ImGui::Text("If you are a pro that wants their preset added to the list, upset because of a missing pro preset or if you found a bug, please contact me");
@@ -417,6 +425,7 @@ void CameraPresets::RenderWindow() {
     ImGui::EndTabBar();
 
     ////////////////////////////////////////////Delete Window Popup////////////////////////////////////////////
+    // saves empty string to main file
     if (DeleteWindow) {
         ImGui::Begin("Delete ALL Presets", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::Text("Are you sure you want to delete all your presets");
@@ -440,7 +449,7 @@ void CameraPresets::RenderWindow() {
         ImGui::BeginTabBar("CreateMenu");
         ////////////////////////////////////////////Create: Custom Preset////////////////////////////////////////////
         if (ImGui::BeginTabItem("Custom")) {
-            
+            // creates temp sliders for user to set new preset
             ImGui::BeginChild("Input", ImVec2{350, (InputNameError == 1 ? 280.0f : 260.0f) }, true, ImGuiWindowFlags_NoScrollbar);
 
             if (InputNameError == 1) {
@@ -482,7 +491,9 @@ void CameraPresets::RenderWindow() {
             }
 
             ImGui::SameLine();
+
             ///////////////////Copy Current Button///////////////////
+            // sets the temp sliders values to the users set values (QoL)
             if (ImGui::Button("Copy Current")) {
                 gameWrapper->Execute([this](GameWrapper* gw) {
                     ProfileCameraSettings settings = gameWrapper->GetSettings().GetCameraSettings();
@@ -499,8 +510,10 @@ void CameraPresets::RenderWindow() {
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem("Pros")) {
+
             ////////////////////////////////////////////Create: Pros Tab////////////////////////////////////////////
+        if (ImGui::BeginTabItem("Pros")) {
+            // looks through pro file and gets the first 10 that fit search
             ImGui::BeginChild("CacheProPlayers", ImVec2{350, 70}, true, ImGuiWindowFlags_NoScrollbar);
             ImGui::Text("Add Pro Player Presets: ");
             if (ImGui::InputTextWithHint("Pro Name", "Enter Pro Player's name", &ProPlayerSearch)) {
@@ -532,8 +545,10 @@ void CameraPresets::RenderWindow() {
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
+
         ////////////////////////////////////////////Create: Freestylers Tab////////////////////////////////////////////
         if (ImGui::BeginTabItem("Freestylers")) {
+            // looks through fs file and gets the first 10 that fit search
 
             ImGui::BeginChild("CacheFreestylePlayers", ImVec2{ 350, 70 }, true, ImGuiWindowFlags_NoScrollbar);
             ImGui::Text("Add Freestyler Presets: ");
@@ -570,6 +585,8 @@ void CameraPresets::RenderWindow() {
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Content Creators")) {
+            // looks through contentcreater file and gets the first 10 that fit search
+
             ImGui::BeginChild("CacheCCPlayers", ImVec2{ 350, 70 }, true, ImGuiWindowFlags_NoScrollbar);
             ImGui::Text("Add Content Creater Presets: ");
 
@@ -606,13 +623,11 @@ void CameraPresets::RenderWindow() {
         }
         if (ImGui::BeginTabItem("Codes")) {
             ////////////////////////////////////////////Create: Codes////////////////////////////////////////////
+            // parses codes and adds them to code list
             ImGui::BeginChild("Codes", ImVec2{350, 50}, true, ImGuiWindowFlags_NoScrollbar);
             ImGui::Columns(2, "AddCodes");
             if (ImGui::Button("Add Code")) {
                 GetAllCodes(CodeAdder);
-                for (auto thing : ImportedCodes) {
-                    LOG("Thing: {}", thing.camera_settings.name);
-                }
                 CodeAdder.clear();
             }
             ImGui::SetColumnWidth(0, 90);
@@ -628,7 +643,6 @@ void CameraPresets::RenderWindow() {
                     CP_CameraSettings& cam = it->camera_settings;
                     std::string name = cam.name;
 
-                    // Append the count to the name if it's not unique
                     cameraNames[name]++;
                     if (cameraNames[name] > 1) {
                         cam.name = name + std::to_string(cameraNames[name]-1);
@@ -660,6 +674,8 @@ void CameraPresets::RenderWindow() {
                     ImGui::EndChild();
                     ImGui::PopID();
 
+                    // leaving this comment in here because its funny
+                    // 
                     // Battle of the i's idk its 2:30am
                     i++;
                     ++it;

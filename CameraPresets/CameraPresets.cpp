@@ -61,7 +61,6 @@ void CameraPresets::LoadSave() {
     if (inputFile.is_open()) {
         std::string line;
         while (std::getline(inputFile, line)) {
-            // Tokenize the line using spaces
             std::istringstream iss(line);
             std::string linePlayerName;
 
@@ -190,11 +189,10 @@ void CameraPresets::DeletePlayerFromFile(std::string playername, std::filesystem
         std::string line;
 
         while (std::getline(inputFile, line)) {
-            // Tokenize the line using spaces
+
             std::istringstream iss(line);
             std::string linePlayerName;
 
-            // Extract the first token
             if (iss >> linePlayerName) {
                 if (linePlayerName != playername) {
                     data += line + "\n";
@@ -295,7 +293,6 @@ void CameraPresets::onUnload() {
     if (inputFile.is_open()) {
         std::string line;
         while (std::getline(inputFile, line)) {
-            // Tokenize the line using spaces
             std::istringstream iss(line);
             std::string linePlayerName;
 
