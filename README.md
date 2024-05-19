@@ -20,6 +20,13 @@ Play Testers: <br>
 # The Window
 ![F1 to view your camera presets](https://github.com/SoulDaMeep/CameraPresets/assets/80908765/1d80a90f-3d80-462f-bee6-82dc67afe8f5)
 
+# Naming
+What if I want to rename something after miss-spelling?
+You can rename a preset in the hub menu where you click and then right click said preset to rename.
+
+![image](https://github.com/SoulDaMeep/CameraPresets/assets/80908765/d39e5a9f-9350-4ef6-bc3e-8bb41877ce2d)
+
+
 
 # Built in Pro Camera Presets
 Thats right! Just search for you favorite player and you can instantly get their camera settings!
