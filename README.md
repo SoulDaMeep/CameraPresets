@@ -75,7 +75,8 @@ MaJicBear#109#90#-4.0#0.45#1.50#270#4.30|Retals#110#100#-4.00#0.45#1.70#270#5.50
 
 # Where do I put these "codes"?
 ### When Creating a Preset, you have the option at the very bottom to paste your codes!
-![image](https://github.com/SoulDaMeep/CameraPresets/assets/80908765/ca5b21d4-179b-4e27-a2a1-39bf5d9a9a47)
+![image](https://github.com/SoulDaMeep/CameraPresets/assets/80908765/1c37e595-e68c-4854-b2a5-939a8ea6729d)
+
 
 ### You will then be granted the option to remove whichever specific one you want!
-![image](https://github.com/SoulDaMeep/CameraPresets/assets/80908765/d2685fe1-9dd6-4fae-8580-d531758bee87)
+![image](https://github.com/SoulDaMeep/CameraPresets/assets/80908765/8b8b151c-cf62-4a87-945a-70d210e7146f)
