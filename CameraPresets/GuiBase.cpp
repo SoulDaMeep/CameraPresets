@@ -29,9 +29,7 @@ void CameraPresets::RenderSettings() {
     });
 
     if (ImGui::IsItemHovered()) {
-        
         ImGui::SetTooltip("Bind: F1");
-        
     }
 
 }
@@ -126,7 +124,7 @@ void CameraPresets::RenderWindow() {
             std::string word;
 
             while (iss >> word) values.push_back(word);
-            LOG("Playername: [{}]", playerName);
+
             bool playerExists = false;
             for (const auto& existingCamera : cameras) {
                 if (existingCamera.name == playerName) {
@@ -406,7 +404,7 @@ void CameraPresets::RenderWindow() {
         ImGui::SeparatorText("Socials");
         
         ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 40);
-        if (ImGui::Button("Github: @souldameep")) {
+        if (ImGui::Button("Github")) {
             system("start https://github.com/SoulDaMeep");
         }
         ImGui::SameLine();
@@ -727,7 +725,7 @@ void PluginWindowBase::Render() {
     ImGui::PushStyleColor(ImGuiCol_Border, ImVec4{9 / 255.f, 204.f / 255.f, 162.f / 255.f, 0.70f});
     ImGui::PushStyleColor(ImGuiCol_BorderShadow, ImVec4(0.00f, 0.00f, 0.00f, 0.24f));
     if (!ImGui::Begin(menuTitle_.c_str(), &isWindowOpen_, ImGuiWindowFlags_NoResize)) {
-        // Early out if the window is collapsed, as an optimization.
+        // Early out if the window is collapsed
         LOG("CameraPresets Collapse");
         ImGui::End();
         return;

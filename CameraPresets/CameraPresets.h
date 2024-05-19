@@ -59,8 +59,6 @@ class CameraPresets: public BakkesMod::Plugin::BakkesModPlugin
     std::string ProPlayerSearch;
     std::string FreestylePlayerSearch;
     std::string CCPlayerSearch;
-
-
     bool isValidCode(std::string code);
     void DeletePlayerFromFile(std::string playername, std::filesystem::path path);
     void SaveToFile(std::string data, std::filesystem::path path);
@@ -92,7 +90,6 @@ class CameraPresets: public BakkesMod::Plugin::BakkesModPlugin
     ImVec4 primary = ImVec4(2.f / 255.f, 190.f / 255.f, 190.f / 255.f, 0.50f);
 
     ImGuiStyle backup;
-	std::string Thing;
 public:
     void RenderSettings() override; // Uncomment if you wanna render your own tab in the settings menu
     void RenderWindow() override; // Uncomment if you want to render your own plugin window
