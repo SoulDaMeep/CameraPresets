@@ -740,7 +740,7 @@ void PluginWindowBase::Render() {
     ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0.19f, 0.19f, 0.19f, 0.92f));
     ImGui::PushStyleColor(ImGuiCol_Border, ImVec4{9 / 255.f, 204.f / 255.f, 162.f / 255.f, 0.70f});
     ImGui::PushStyleColor(ImGuiCol_BorderShadow, ImVec4(0.00f, 0.00f, 0.00f, 0.24f));
-    if (!ImGui::Begin(menuTitle_.c_str(), &isWindowOpen_, ImGuiWindowFlags_NoResize)) {
+    if (!ImGui::Begin(menuTitle_.c_str(), &isWindowOpen_, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
         // Early out if the window is collapsed
         LOG("CameraPresets Collapse");
         ImGui::End();
@@ -749,16 +749,16 @@ void PluginWindowBase::Render() {
 
     RenderWindow();
 
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
     ImGui::End();
-    ImGui::PopStyleColor();
-    ImGui::PopStyleColor();
-    ImGui::PopStyleColor();
-    ImGui::PopStyleColor();
-    ImGui::PopStyleColor();
-    ImGui::PopStyleColor();
-    ImGui::PopStyleColor();
-    ImGui::PopStyleColor();
-    ImGui::PopStyleColor();
 
 
     if (!isWindowOpen_) {
